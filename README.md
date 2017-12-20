@@ -1,3 +1,5 @@
+![Banner](https://image.prntscr.com/image/vMHp1JlFSi_51KvHGOIehA.png)
+
 # Eternal Light
 > Adds the ability to show the light-levels of blocks around you.
 
