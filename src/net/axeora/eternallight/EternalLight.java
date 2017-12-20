@@ -5,15 +5,18 @@ import net.axeora.eternallight.cmd.LightCommand;
 import net.axeora.eternallight.handle.Projector;
 import net.axeora.eternallight.listener.PlayerConnectionListener;
 import net.axeora.eternallight.listener.PlayerMoveListener;
+import net.axeora.eternallight.util.StringUtil;
 import net.axeora.eternallight.util.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public class EternalLight extends JavaPlugin {
 
@@ -44,13 +47,22 @@ public class EternalLight extends JavaPlugin {
         config = new EternalLightConfig();
         config.init(this);
 
-        VersionChecker checker = new VersionChecker(25618, "1.2");
+        VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, PluginData.VERSION);
         checker.run(s -> {
-            System.out.println(" ");
-            System.out.println(" Current: " + Arrays.toString(s.getCurrent()));
-            System.out.println(" Latest: " + Arrays.toString(s.getLatest()));
-            System.out.println(" State: " + s.getState());
-            System.out.println(" ");
+            if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
+                getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+            }
+            else if (s.getState() == VersionChecker.PluginVersionState.DEV_BUILD) {
+                getLogger().log(Level.WARNING, "You are using a development build! Expect bugs.");
+            }
+            else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
+                ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                sender.sendMessage(StringUtil.color(""));
+                sender.sendMessage(StringUtil.color("&e New update available for " + PluginData.NAME));
+                sender.sendMessage(StringUtil.color(" Current version: &e" + PluginData.VERSION));
+                sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
+                sender.sendMessage(StringUtil.color(""));
+            }
             this.versionMeta = s;
         });
     }
@@ -81,7 +93,7 @@ public class EternalLight extends JavaPlugin {
             }
             CommandMap map = (CommandMap) f.get(Bukkit.getServer());
             for (Command cmd : commands) {
-                map.register("MassCore", cmd);
+                map.register(PluginData.NAME, cmd);
                 map.getCommand(cmd.getName()).setAliases(cmd.getAliases());
                 map.getCommand(cmd.getName()).setDescription(cmd.getDescription());
                 map.getCommand(cmd.getName()).setUsage(cmd.getUsage());

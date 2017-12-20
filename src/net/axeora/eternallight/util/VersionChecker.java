@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -91,23 +92,46 @@ public class VersionChecker {
         public byte[] getLatest() {
             return latest;
         }
+
+        public String getLatestVersion() {
+            return bytesToVer(this.latest);
+        }
+
+        private String bytesToVer(byte[] version) {
+            StringBuilder builder = new StringBuilder();
+            for (byte build : version) {
+                builder.append(build).append(".");
+            }
+            return builder.substring(0, builder.length() - 1);
+        }
     }
 
     public enum PluginVersionState {
         DEV_BUILD, LATEST, BEHIND, UNKNOWN;
 
         public static PluginVersionState getState(byte[] c, byte[] l) {
-            if (c != l && !isBehind(c, l)) return DEV_BUILD;
-            if (c == l) return LATEST;
-            return BEHIND;
+            if (match(c, l)) return LATEST;
+            if (isBehind(c, l)) return BEHIND;
+            return DEV_BUILD;
         }
 
         private static boolean isBehind(byte[] c, byte[] l) {
-            int v = c.length >= l.length ? l.length : c.length;
+            int v = c.length >= l.length ? c.length : l.length;
             for (int i = 0; i < v; i++) {
-                if (c[i] < l[i]) return true;
+                byte cu = c.length > i ? c[i] : -1;
+                byte la = l.length > i ? l[i] : -1;
+                if (cu != -1 && la != -1 && (cu < la)) return true;
+                if (la != -1 && cu == -1) return true;
             }
             return false;
+        }
+
+        private static boolean match(byte[] b1, byte[] b2) {
+            if (b1.length != b2.length) return false;
+            for (int i = 0; i < b1.length; i++) {
+                if (b1[i] != b2[i]) return false;
+            }
+            return true;
         }
     }
 }
