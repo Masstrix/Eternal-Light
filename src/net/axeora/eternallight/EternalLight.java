@@ -5,6 +5,7 @@ import net.axeora.eternallight.cmd.LightCommand;
 import net.axeora.eternallight.handle.Projector;
 import net.axeora.eternallight.listener.PlayerConnectionListener;
 import net.axeora.eternallight.listener.PlayerMoveListener;
+import net.axeora.eternallight.util.ReflectionUtil;
 import net.axeora.eternallight.util.StringUtil;
 import net.axeora.eternallight.util.VersionChecker;
 import org.bukkit.Bukkit;
@@ -40,6 +41,8 @@ public class EternalLight extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        if (isLegacy()) getLogger().info("Detected legacy version. Using legacy methods to support your version.");
+
         api = new EternalLightAPI();
         projector = new Projector();
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
@@ -62,7 +65,8 @@ public class EternalLight extends JavaPlugin {
                 getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
             }
             else if (s.getState() == VersionChecker.PluginVersionState.DEV_BUILD) {
-                getLogger().log(Level.WARNING, "You are using a development build! Expect bugs.");
+                ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
             }
             else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
                 ConsoleCommandSender sender = Bukkit.getConsoleSender();
@@ -74,6 +78,14 @@ public class EternalLight extends JavaPlugin {
             }
             this.versionMeta = s;
         });
+    }
+
+    /**
+     * @return if the server version is 1.8 or below.
+     */
+    public boolean isLegacy() {
+        byte[] ver = ReflectionUtil.getVersionUnsafe();
+        return ver.length > 1 && ver[1] <= 8;
     }
 
     public Projector getProjector() {

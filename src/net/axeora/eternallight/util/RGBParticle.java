@@ -1,5 +1,8 @@
 package net.axeora.eternallight.util;
 
+import net.axeora.eternallight.EternalLight;
+import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 
@@ -56,6 +59,12 @@ public class RGBParticle {
     }
 
     public void send(Player player, double x, double y, double z) {
-        player.spawnParticle(Particle.REDSTONE, x, y, z, 0, r + 0.0001, g, b, 1);
+        if (EternalLight.getInstance().isLegacy()) {
+            Location location = new Location(player.getWorld(), x, y, z);
+            player.spigot().playEffect(location, Effect.COLOURED_DUST, 0, 1,
+                    (float) r + 0.01F, (float) g, (float) b, 1, 0, 64);
+        } else {
+            player.spawnParticle(Particle.REDSTONE, x, y, z, 0, r + 0.0001, g, b, 1);
+        }
     }
 }
