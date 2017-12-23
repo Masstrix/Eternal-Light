@@ -24,14 +24,23 @@ public class EternalLight extends JavaPlugin {
     private Projector projector;
     private EternalLightConfig config;
     private VersionChecker.VersionMeta versionMeta;
+    private EternalLightAPI api;
 
     public static EternalLight getInstance() {
         return instance;
     }
 
+    /**
+     * @return the plugins API.
+     */
+    public EternalLightAPI getAPI() {
+        return api;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
+        api = new EternalLightAPI();
         projector = new Projector();
         Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerConnectionListener(), this);

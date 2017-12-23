@@ -12,76 +12,6 @@ import java.util.*;
 
 public class LightVisual {
 
-    private static Set<ListItem> blocks = new HashSet<>();
-    private final byte[] VALID_STAIR = new byte[] {4, 5, 6, 7};
-
-    static {
-        // 2 = transparent & solid
-        // 1 = transparent
-        // 0 = opaque
-        blocks.addAll(Arrays.asList(
-                new ListItem("pot", (byte) 2),
-                new ListItem("web", (byte) 2),
-                new ListItem("glass", (byte) 2),
-                new ListItem("glowstone", (byte) 1),
-                new ListItem("ice", (byte) 1),
-                new ListItem("lantern", (byte) 1),
-                new ListItem("leaves", (byte) 2),
-                new ListItem("piston", (byte) 2),
-                new ListItem("lamp", (byte) 2),
-                new ListItem("tnt", (byte) 1),
-                new ListItem("anvil", (byte) 2),
-                new ListItem("bars", (byte) 2),
-                new ListItem("bed", (byte) 1),
-                new ListItem("glowstone", (byte) 1),
-                new ListItem("cake", (byte) 1),
-                new ListItem("carpet", (byte) 2),
-                new ListItem("cauldron", (byte) 1),
-                new ListItem("chest", (byte) 2),
-                new ListItem("wall", (byte) 1),
-                new ListItem("detector", (byte) 1),
-                new ListItem("door", (byte) 2),
-                new ListItem("enchantment", (byte) 1),
-                new ListItem("farm", (byte) 1),
-                new ListItem("fence", (byte) 2),
-                new ListItem("lily", (byte) 2),
-                new ListItem("repeater", (byte) 1),
-                new ListItem("comparator", (byte) 2),
-                new ListItem("snow_layer", (byte) 1),
-                new ListItem("vine", (byte) 1),
-                new ListItem("button", (byte) 1),
-                new ListItem("lever", (byte) 1),
-                new ListItem("pressure_plate", (byte) 2),
-                new ListItem("rail", (byte) 1),
-                new ListItem("repeater", (byte) 1),
-                new ListItem("redstone_block", (byte) 0),
-                new ListItem("redstone_wire", (byte) 2),
-                new ListItem("torch", (byte) 1),
-                new ListItem("dust", (byte) 2),
-                new ListItem("portal", (byte) 1),
-                new ListItem("fire", (byte) 1),
-                new ListItem("ladder", (byte) 1),
-                new ListItem("sign", (byte) 1),
-                new ListItem("torch", (byte) 1),
-                new ListItem("cactus", (byte) 1),
-                new ListItem("crop", (byte) 2),
-                new ListItem("potato", (byte) 2),
-                new ListItem("beetroot", (byte) 2),
-                new ListItem("flower", (byte) 1),
-                new ListItem("rose", (byte) 1),
-                new ListItem("long_grass", (byte) 1),
-                new ListItem("plant", (byte) 1),
-                new ListItem("mushroom", (byte) 1),
-                new ListItem("diode", (byte) 2),
-                new ListItem("plate", (byte) 2),
-                new ListItem("end_rod", (byte) 2),
-                new ListItem("sapling", (byte) 1),
-                new ListItem("sugar", (byte) 1),
-                new ListItem("spawner", (byte) 1),
-                new ListItem("tripwire", (byte) 1),
-                new ListItem("banner", (byte) 1)));
-    }
-
     private final UUID PLAYER_UUID;
     private Player player;
     private boolean enabled = false;
@@ -217,6 +147,7 @@ public class LightVisual {
 
     private int getBlockOpacity(Material material) {
         String n = material.name().toLowerCase();
+        Set<ListItem> blocks = EternalLight.getInstance().getAPI().getBlocks();
         for (ListItem s : blocks) {
             if (n.contains(s.getTag().toLowerCase())) {
                 return s.getLevel();
@@ -239,7 +170,8 @@ public class LightVisual {
         String n = block.getType().name();
         byte data = block.getData();
         if (n.toLowerCase().contains("stairs")) {
-            for (byte b : VALID_STAIR)
+            byte[] valid = EternalLight.getInstance().getAPI().getValidStairRotations();
+            for (byte b : valid)
                 if (data == b) return true;
         } else {
             return true;
