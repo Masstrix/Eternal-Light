@@ -89,7 +89,7 @@ public class EternalLight extends JavaPlugin {
      */
     public boolean isLegacy() {
         byte[] ver = ReflectionUtil.getVersionUnsafe();
-        return ver.length > 1 && ver[1] <= 8;
+        return ver.length > 1 && ver[1] < Integer.parseInt(PluginData.MIN_SUPPORTED_VERSION.split("\\.")[1]);
     }
 
     public Projector getProjector() {
