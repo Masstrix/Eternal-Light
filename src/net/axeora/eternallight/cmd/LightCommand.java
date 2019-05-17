@@ -25,11 +25,19 @@ public class LightCommand extends EternalCommand {
 
     @Override
     public boolean execute(CommandSender sender, String s, String[] args) {
+
+        // Check if we're console
         if (sender instanceof ConsoleCommandSender) {
             Bukkit.getConsoleSender().sendMessage(StringUtil.color(
                     "[" + PluginData.NAME + "] &cOnly players can use this command!"));
             return false;
         }
+
+        // Check permissions
+        if (!testPermission(sender)) {
+            return false;
+        }
+
         Player player = (Player) sender;
         Projector projector = EternalLight.getInstance().getProjector();
         if (!projector.contains(player.getUniqueId())) projector.add(player);

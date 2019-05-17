@@ -19,6 +19,12 @@ public class ELCommand extends EternalCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+
+        // Check permissions
+        if (!testPermission(sender)) {
+            return false;
+        }
+
         if (args.length == 0) {
             msg(sender, "");
             msg(sender, "   &e&lEternal Light &7" + PluginData.VERSION);
