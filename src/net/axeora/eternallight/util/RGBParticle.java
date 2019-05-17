@@ -10,6 +10,7 @@ import java.awt.*;
 
 public class RGBParticle {
 
+    // 0 - 1
     private double r = 0, g = 0, b = 0;
 
     public RGBParticle() {}
@@ -59,12 +60,7 @@ public class RGBParticle {
     }
 
     public void send(Player player, double x, double y, double z) {
-        if (EternalLight.getInstance().isLegacy()) {
-            Location location = new Location(player.getWorld(), x, y, z);
-            player.spigot().playEffect(location, Effect.COLOURED_DUST, 0, 1,
-                    (float) r + 0.01F, (float) g, (float) b, 1, 0, 64);
-        } else {
-            player.spawnParticle(Particle.REDSTONE, x, y, z, 0, r + 0.0001, g, b, 1);
-        }
+        player.spawnParticle(Particle.REDSTONE, x, y, z, 0, new Particle.DustOptions(org.bukkit.Color.fromRGB(
+                (int)(r*255), (int)(g*255), (int)(b*255)), 1 ));
     }
 }

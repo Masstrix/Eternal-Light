@@ -41,43 +41,47 @@ public class EternalLight extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        if (isLegacy()) getLogger().info("Detected legacy version. Using legacy methods to support your version.");
 
-        api = new EternalLightAPI();
-        projector = new Projector();
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerConnectionListener(), this);
-        registerCommand(new LightCommand());
-        registerCommand(new ELCommand());
-
-        File file = new File(getDataFolder() + "/config.yml");
-        if (!file.exists()) {
-            saveDefaultConfig();
-            reloadConfig();
+        if (isLegacy()) {
+            getLogger().info("Detected legacy version. Disabling plugin!");
+            this.setEnabled(false);
         }
 
-        config = new EternalLightConfig();
-        config.init(this);
+        if (this.isEnabled()) {
+            api = new EternalLightAPI();
+            projector = new Projector();
+            Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
+            Bukkit.getPluginManager().registerEvents(new PlayerConnectionListener(), this);
+            registerCommand(new LightCommand());
+            registerCommand(new ELCommand());
 
-        VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, PluginData.VERSION);
-        checker.run(s -> {
-            if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
-                getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+            File file = new File(getDataFolder() + "/config.yml");
+            if (!file.exists()) {
+                saveDefaultConfig();
+                reloadConfig();
             }
-            else if (s.getState() == VersionChecker.PluginVersionState.DEV_BUILD) {
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
-            }
-            else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                sender.sendMessage(StringUtil.color(""));
-                sender.sendMessage(StringUtil.color("&e New update available for " + PluginData.NAME));
-                sender.sendMessage(StringUtil.color(" Current version: &e" + PluginData.VERSION));
-                sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
-                sender.sendMessage(StringUtil.color(""));
-            }
-            this.versionMeta = s;
-        });
+
+            config = new EternalLightConfig();
+            config.init(this);
+
+            VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, PluginData.VERSION);
+            checker.run(s -> {
+                if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
+                    getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+                } else if (s.getState() == VersionChecker.PluginVersionState.DEV_BUILD) {
+                    ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                    sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
+                } else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
+                    ConsoleCommandSender sender = Bukkit.getConsoleSender();
+                    sender.sendMessage(StringUtil.color(""));
+                    sender.sendMessage(StringUtil.color("&e New update available for " + PluginData.NAME));
+                    sender.sendMessage(StringUtil.color(" Current version: &e" + PluginData.VERSION));
+                    sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
+                    sender.sendMessage(StringUtil.color(""));
+                }
+                this.versionMeta = s;
+            });
+        }
     }
 
     /**
