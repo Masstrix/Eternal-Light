@@ -20,20 +20,11 @@ public class EternalLight extends JavaPlugin {
     private Projector projector;
     private EternalLightConfig config;
     private VersionChecker.VersionMeta versionMeta;
-    private EternalLightAPI api;
-
-    /**
-     * @return the plugins API.
-     */
-    public EternalLightAPI getAPI() {
-        return api;
-    }
 
     @Override
     public void onEnable() {
         if (isLegacy()) getLogger().info("Detected legacy version. Using legacy methods to support your version.");
 
-        api = new EternalLightAPI();
         projector = new Projector(this);
         registerListener(new PlayerMoveListener(this), new PlayerConnectionListener(this));
         registerCommands(new ELCommand(this), new LightCommand(this));
