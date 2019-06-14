@@ -46,7 +46,7 @@ public class Projector {
     /**
      * @param uuid who is being removed from the projector.
      */
-    public void remove(UUID uuid) {
+    void remove(UUID uuid) {
         if (visualMap.containsKey(uuid)) {
             visualMap.get(uuid).hide();
             visualMap.remove(uuid);
@@ -65,7 +65,7 @@ public class Projector {
      * @param uuid who's visual to return.
      * @return the players visual or null if none exists.
      */
-    public LightVisual getVisual(UUID uuid) {
+    private LightVisual getVisual(UUID uuid) {
         return visualMap.getOrDefault(uuid, null);
     }
 

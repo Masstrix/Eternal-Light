@@ -9,7 +9,7 @@ public class BlockKeyMatch implements BlockKey {
     private Pattern pattern;
     private SpawnValue value;
 
-    public BlockKeyMatch(String pattern, SpawnValue value) {
+    BlockKeyMatch(String pattern, SpawnValue value) {
         this.pattern = Pattern.compile(pattern);
         this.value = value;
     }

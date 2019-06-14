@@ -57,7 +57,7 @@ public class VersionChecker {
         private byte[] current = null, latest = null;
         private PluginVersionState state;
 
-        public VersionMeta(String current, String latest) {
+        VersionMeta(String current, String latest) {
             if (latest == null || latest.equalsIgnoreCase("unknown")) {
                 state = PluginVersionState.UNKNOWN;
                 return;

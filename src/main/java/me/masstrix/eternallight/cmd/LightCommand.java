@@ -8,8 +8,6 @@ import me.masstrix.eternallight.PluginData;
 import me.masstrix.eternallight.util.EternalCommand;
 import me.masstrix.eternallight.util.StringUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;

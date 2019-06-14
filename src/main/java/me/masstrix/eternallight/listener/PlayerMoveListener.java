@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.Objects;
+
 public class PlayerMoveListener implements Listener {
 
     private EternalLight plugin;
@@ -21,7 +23,7 @@ public class PlayerMoveListener implements Listener {
         Location from = event.getFrom();
         Location to = event.getTo();
 
-        if (from.getBlockX() == to.getBlockX()
+        if (from.getBlockX() == Objects.requireNonNull(to).getBlockX()
                 || from.getBlockZ() == to.getBlockZ()
                 || from.getBlockY() == to.getBlockY()) {
             return;

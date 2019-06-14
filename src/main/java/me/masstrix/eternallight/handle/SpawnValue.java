@@ -2,7 +2,6 @@ package me.masstrix.eternallight.handle;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,20 +33,30 @@ public enum SpawnValue {
         blocks.add(new BlockKeyMat(Material.END_PORTAL_FRAME, NEVER));
         blocks.add(new BlockKeyMat(Material.END_CRYSTAL, NEVER));
         blocks.add(new BlockKeyMat(Material.END_PORTAL, NEVER));
-        blocks.add(new BlockKeyMat(Material.CAKE, NEVER));
         blocks.add(new BlockKeyMat(Material.LANTERN, NEVER));
-        blocks.add(new BlockKeyMat(Material.SCAFFOLDING, NEVER));
-        blocks.add(new BlockKeyMat(Material.CAKE, NEVER));
 
         blocks.add(new BlockKeyMat(Material.BELL, NEVER));
         blocks.add(new BlockKeyMat(Material.GRINDSTONE, NEVER));
-        blocks.add(new BlockKeyMat(Material.SMOKER, NEVER));
-        blocks.add(new BlockKeyMat(Material.LOOM, NEVER));
         blocks.add(new BlockKeyMat(Material.ANVIL, NEVER));
-        blocks.add(new BlockKeyMat(Material.BARREL, NEVER));
-        blocks.add(new BlockKeyMat(Material.FURNACE, NEVER));
-        blocks.add(new BlockKeyMat(Material.BLAST_FURNACE, NEVER));
         blocks.add(new BlockKeyMat(Material.COMPOSTER, NEVER));
+        blocks.add(new BlockKeyMat(Material.BREWING_STAND, NEVER));
+        blocks.add(new BlockKeyMat(Material.IRON_BARS, NEVER));
+        blocks.add(new BlockKeyMat(Material.STONECUTTER, NEVER));
+        blocks.add(new BlockKeyMat(Material.CAMPFIRE, NEVER));
+        blocks.add(new BlockKeyMat(Material.LECTERN, NEVER));
+        blocks.add(new BlockKeyMat(Material.CAULDRON, NEVER));
+        blocks.add(new BlockKeyMat(Material.HOPPER, NEVER));
+        blocks.add(new BlockKeyMat(Material.CONDUIT, NEVER));
+        blocks.add(new BlockKeyMat(Material.BAMBOO, NEVER));
+        blocks.add(new BlockKeyMat(Material.TURTLE_EGG, NEVER));
+        blocks.add(new BlockKeyMat(Material.ENCHANTING_TABLE, NEVER));
+        blocks.add(new BlockKeyMat(Material.BEDROCK, NEVER));
+        blocks.add(new BlockKeyMat(Material.FARMLAND, NEVER));
+        blocks.add(new BlockKeyMat(Material.BARRIER, NEVER));
+        blocks.add(new BlockKeyMat(Material.GRASS_PATH, NEVER));
+        blocks.add(new BlockKeyMat(Material.DRAGON_EGG, NEVER));
+
+        blocks.add(new BlockKeyMat(Material.SCAFFOLDING, ALWAYS));
 
         // Redstone
         blocks.add(new BlockKeyMat(Material.TRIPWIRE, TRANSPARENT));
@@ -70,14 +79,15 @@ public enum SpawnValue {
 
         blocks.add(new BlockKeyMatch("(.*)chest", NEVER));
         blocks.add(new BlockKeyMatch("(.*)fence", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)slab", NEVER));
         blocks.add(new BlockKeyMatch("(.*)bed", NEVER));
         blocks.add(new BlockKeyMatch("(.*)leaves", NEVER));
         blocks.add(new BlockKeyMatch("(.*)pressure_plate", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)door", NEVER));
+        blocks.add(new BlockKeyMatch("(.*)door", TRANSPARENT));
         blocks.add(new BlockKeyMatch("(.*)sign", TRANSPARENT));
         blocks.add(new BlockKeyMatch("(.*)coral", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)_table", NEVER));
+        blocks.add(new BlockKeyMatch("(.*)coral_fan", TRANSPARENT));
+        blocks.add(new BlockKeyMatch("(.*)fence_gate", TRANSPARENT));
+        blocks.add(new BlockKeyMatch("(.*)banner", TRANSPARENT));
         blocks.add(new BlockKeyMatch("(.*)glass(.*)", NEVER));
         blocks.add(new BlockKeyMatch("(.*)wall(.*)", NEVER));
 

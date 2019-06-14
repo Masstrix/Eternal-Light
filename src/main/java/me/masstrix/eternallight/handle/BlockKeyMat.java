@@ -8,7 +8,7 @@ public class BlockKeyMat implements BlockKey {
     private Material mat;
     private SpawnValue value;
 
-    public BlockKeyMat(Material mat, SpawnValue value) {
+    BlockKeyMat(Material mat, SpawnValue value) {
         this.mat = mat;
         this.value = value;
     }

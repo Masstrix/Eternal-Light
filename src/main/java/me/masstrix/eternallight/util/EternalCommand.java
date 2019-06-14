@@ -20,11 +20,7 @@ public abstract class EternalCommand implements CommandExecutor, TabCompleter {
         this.name = name;
     }
 
-    public void msg(CommandSender sender, String msg) {
-        sender.sendMessage(StringUtil.color(msg));
-    }
-
-    public void msg(String msg) {
+    protected void msg(String msg) {
         sender.sendMessage(StringUtil.color(msg));
     }
 
@@ -45,15 +41,15 @@ public abstract class EternalCommand implements CommandExecutor, TabCompleter {
         return name;
     }
 
-    public String getLabelUsed() {
+    protected String getLabelUsed() {
         return label;
     }
 
-    public boolean wasPlayer() {
+    protected boolean wasPlayer() {
         return sender instanceof Player;
     }
 
-    public CommandSender getSender() {
+    protected CommandSender getSender() {
         return sender;
     }
 

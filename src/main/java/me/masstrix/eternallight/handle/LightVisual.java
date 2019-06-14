@@ -2,15 +2,21 @@ package me.masstrix.eternallight.handle;
 
 import me.masstrix.eternallight.EternalLightConfig;
 import me.masstrix.eternallight.util.RGBParticle;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.*;
+import org.bukkit.block.data.type.Slab;
+import org.bukkit.block.data.type.Snow;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 
-import java.awt.Color;
-import java.util.*;
+import java.awt.*;
+import java.util.UUID;
 
 public class LightVisual {
 
@@ -18,10 +24,10 @@ public class LightVisual {
     private Projector projector;
     private Player player;
     private boolean enabled = false;
-    private DisplayMethod type = DisplayMethod.SPAWNABLE;
+    private DisplayMethod type = DisplayMethod.ALL;
     private EternalLightConfig config;
 
-    public LightVisual(Projector projector, UUID uuid) {
+    LightVisual(Projector projector, UUID uuid) {
         this.projector = projector;
         PLAYER_UUID = uuid;
         player = Bukkit.getPlayer(uuid);
@@ -38,7 +44,7 @@ public class LightVisual {
     /**
      * Enable the and show the light levels as a visualized display.
      */
-    public void show() {
+    private void show() {
         enabled = true;
         update();
     }
@@ -46,7 +52,7 @@ public class LightVisual {
     /**
      * Disable the light level display.
      */
-    public void hide() {
+    void hide() {
         if (!enabled) return;
         enabled = false;
         update();
@@ -117,6 +123,13 @@ public class LightVisual {
                         if (isStairInSpawnRotation(block)) spawnValue = SpawnValue.ALWAYS;
                         else continue;
                     }
+                    if (blockData instanceof Slab) {
+                        if(isSlabHalfTop(block)) spawnValue = SpawnValue.ALWAYS;
+                        else continue;
+                    }
+                    if (blockData instanceof TrapDoor) {
+                        spawnValue = trapDoorSpawnValue(block);
+                    }
                     if (spawnValue != SpawnValue.ALWAYS) continue;
 
                     // Validate if there is a 2 block gap above for mobs to spawn.
@@ -184,6 +197,30 @@ public class LightVisual {
             return stair.getHalf() == Bisected.Half.TOP;
         }
         return false;
+    }
+
+    private boolean isSlabHalfTop(Block block) {
+        BlockData data = block.getBlockData();
+        if (data instanceof Slab) {
+            Slab slab = (Slab) data;
+            return slab.getType().equals(Slab.Type.TOP) || slab.getType().equals(Slab.Type.DOUBLE);
+        }
+        return false;
+    }
+
+    private SpawnValue trapDoorSpawnValue(Block block) {
+        BlockData data = block.getBlockData();
+        TrapDoor trapDoor = (TrapDoor) data;
+
+        if (trapDoor.isOpen()) {
+            return SpawnValue.TRANSPARENT;
+        } else {
+            if (trapDoor.getHalf() == Bisected.Half.BOTTOM) {
+                return SpawnValue.NEVER;
+            } else {
+                return SpawnValue.ALWAYS;
+            }
+        }
     }
 
     private enum LightSpawnCase {

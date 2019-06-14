@@ -26,7 +26,7 @@ public class RGBParticle {
         b = color.getBlue();
     }
 
-    public void setColor(int r, int g, int b) {
+    private void setColor(int r, int g, int b) {
         this.r = r;
         this.g = g;
         this.b = b;
@@ -51,7 +51,7 @@ public class RGBParticle {
         display(player, new Location(player.getWorld(), x, y, z));
     }
 
-    public void display(Player player, Location loc) {
+    private void display(Player player, Location loc) {
         player.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(org.bukkit.Color.fromRGB(r, g, b), 1));
     }
 
