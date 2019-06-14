@@ -11,9 +11,9 @@
 #   /lightlevels mode - (eternallight.use) Toggles between active modes.
 #                     ---
 # MODES:
-#   NORMAL - Red and yellow areas shown.
-#   INCLUSIVE - Red, yellow and green areas shown.
-#   SMOOTH - All areas show like INCLUSIVE mode but smoothed.
+#   SPAWNABLE - Red and yellow areas shown.
+#   ALL - Red, yellow and green areas shown.
+#   LIGHTLEVEL - All areas show like ALL mode but smoothed.
 #                      ---
 general:
   update-notifications: true

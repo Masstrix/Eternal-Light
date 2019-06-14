@@ -1,11 +1,11 @@
-package net.axeora.eternallight.handle;
+package me.masstrix.eternallight.handle;
 
-public class ListItem {
+public class BlockOpacityData {
 
     private String tag;
     private byte level;
 
-    public ListItem(String tag, byte level) {
+    public BlockOpacityData(String tag, byte level) {
         this.tag = tag;
         this.level = level;
     }

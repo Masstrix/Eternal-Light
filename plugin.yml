@@ -1,4 +1,18 @@
 name: EternalLight
-main: net.axeora.eternallight.EternalLight
-version: 1.2
+main: me.masstrix.eternallight.EternalLight
+description: "Eternal Light makes it easy to see where mobs can spawn."
+version: 1.3
 author: Masstrix
+api-version: 1.13
+
+commands:
+  eternallight:
+    aliases:
+      - el
+    description: "Base command for Eternal Light."
+    permission: "eternallight.admin"
+  lightlevels:
+    aliases:
+      - ll
+    description: "Light level options."
+    permission: "eternallight.use"

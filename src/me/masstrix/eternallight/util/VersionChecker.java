@@ -1,15 +1,16 @@
-package net.axeora.eternallight.util;
+package me.masstrix.eternallight.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class VersionChecker {
 
-    private static ExecutorService task = Executors.newFixedThreadPool(1);
+    private static ExecutorService task = Executors.newSingleThreadExecutor(r -> new Thread(r, "VersionChecker"));
     private int id;
     private String current;
 
@@ -27,12 +28,9 @@ public class VersionChecker {
         task.execute(() -> {
             try {
                 HttpURLConnection con = (HttpURLConnection) (
-                        new URL("http://www.spigotmc.org/api/general.php")).openConnection();
+                        new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id)).openConnection();
                 con.setDoOutput(true);
                 con.setRequestMethod("POST");
-                con.getOutputStream().write((
-                        "key=98BE0FE67F88AB82B4C197FAF1DC3B69206EFDCC4D3B80FC83A00037510B99B4&" +
-                                "resource=" + id).getBytes("UTF-8"));
                 String latest = (new BufferedReader(new InputStreamReader(con.getInputStream()))).readLine();
                 callback.done(new VersionMeta(current, latest));
             } catch (Exception e) {
@@ -55,14 +53,17 @@ public class VersionChecker {
      * Meta for a plugins version returned in {@link VersionCallback#done(VersionMeta)}.
      */
     public class VersionMeta {
+        private String currentStr, latestStr;
         private byte[] current = null, latest = null;
         private PluginVersionState state;
 
         public VersionMeta(String current, String latest) {
-            if (latest.equalsIgnoreCase("unknown")) {
+            if (latest == null || latest.equalsIgnoreCase("unknown")) {
                 state = PluginVersionState.UNKNOWN;
                 return;
             }
+            this.currentStr = current;
+            this.latestStr = latest;
             try {
                 this.current = getBytes(current.split("\\."));
                 this.latest = getBytes(latest.split("\\."));
@@ -84,16 +85,20 @@ public class VersionChecker {
             return state;
         }
 
-        public byte[] getCurrent() {
+        public byte[] getCurrentBytes() {
             return current;
         }
 
-        public byte[] getLatest() {
+        public byte[] getLatestBytes() {
             return latest;
         }
 
+        public String getCurrentVersion() {
+            return currentStr;
+        }
+
         public String getLatestVersion() {
-            return bytesToVer(this.latest);
+            return latestStr;
         }
 
         private String bytesToVer(byte[] version) {
@@ -109,13 +114,13 @@ public class VersionChecker {
         DEV_BUILD, LATEST, BEHIND, UNKNOWN;
 
         public static PluginVersionState getState(byte[] c, byte[] l) {
-            if (match(c, l)) return LATEST;
+            if (Arrays.equals(c, l)) return LATEST;
             if (isBehind(c, l)) return BEHIND;
             return DEV_BUILD;
         }
 
         private static boolean isBehind(byte[] c, byte[] l) {
-            int v = c.length >= l.length ? c.length : l.length;
+            int v = c.length > l.length ? c.length : l.length;
             for (int i = 0; i < v; i++) {
                 byte cu = c.length > i ? c[i] : -1;
                 byte la = l.length > i ? l[i] : -1;
@@ -123,14 +128,6 @@ public class VersionChecker {
                 if (la != -1 && cu == -1) return true;
             }
             return false;
-        }
-
-        private static boolean match(byte[] b1, byte[] b2) {
-            if (b1.length != b2.length) return false;
-            for (int i = 0; i < b1.length; i++) {
-                if (b1[i] != b2[i]) return false;
-            }
-            return true;
         }
     }
 }

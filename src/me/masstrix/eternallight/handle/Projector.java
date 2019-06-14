@@ -1,7 +1,8 @@
-package net.axeora.eternallight.handle;
+package me.masstrix.eternallight.handle;
 
-import net.axeora.eternallight.EternalLight;
+import me.masstrix.eternallight.EternalLight;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -10,9 +11,11 @@ import java.util.UUID;
 
 public class Projector {
 
+    protected EternalLight plugin;
     private Map<UUID, LightVisual> visualMap = new HashMap<>();
 
-    {
+    public Projector(EternalLight plugin) {
+        this.plugin = plugin;
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -20,7 +23,7 @@ public class Projector {
                     visual.update();
                 }
             }
-        }.runTaskTimer(EternalLight.getInstance(), 20, 5);
+        }.runTaskTimer(plugin, 20, 5);
     }
 
     /**
@@ -28,7 +31,7 @@ public class Projector {
      */
     public void add(Player player) {
         if (player == null || this.contains(player.getUniqueId())) return;
-        LightVisual visual = new LightVisual(player.getUniqueId());
+        LightVisual visual = new LightVisual(this, player.getUniqueId());
         visualMap.put(player.getUniqueId(), visual);
     }
 

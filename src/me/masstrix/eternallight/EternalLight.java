@@ -1,35 +1,26 @@
-package net.axeora.eternallight;
+package me.masstrix.eternallight;
 
-import net.axeora.eternallight.cmd.ELCommand;
-import net.axeora.eternallight.cmd.LightCommand;
-import net.axeora.eternallight.handle.Projector;
-import net.axeora.eternallight.listener.PlayerConnectionListener;
-import net.axeora.eternallight.listener.PlayerMoveListener;
-import net.axeora.eternallight.util.ReflectionUtil;
-import net.axeora.eternallight.util.StringUtil;
-import net.axeora.eternallight.util.VersionChecker;
+import me.masstrix.eternallight.cmd.LightCommand;
+import me.masstrix.eternallight.handle.Projector;
+import me.masstrix.eternallight.listener.PlayerConnectionListener;
+import me.masstrix.eternallight.listener.PlayerMoveListener;
+import me.masstrix.eternallight.util.*;
+import me.masstrix.eternallight.cmd.ELCommand;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandMap;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.logging.Level;
 
 public class EternalLight extends JavaPlugin {
 
-    private static EternalLight instance;
     private Projector projector;
     private EternalLightConfig config;
     private VersionChecker.VersionMeta versionMeta;
     private EternalLightAPI api;
-
-    public static EternalLight getInstance() {
-        return instance;
-    }
 
     /**
      * @return the plugins API.
@@ -40,15 +31,12 @@ public class EternalLight extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
         if (isLegacy()) getLogger().info("Detected legacy version. Using legacy methods to support your version.");
 
         api = new EternalLightAPI();
-        projector = new Projector();
-        Bukkit.getPluginManager().registerEvents(new PlayerMoveListener(), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerConnectionListener(), this);
-        registerCommand(new LightCommand());
-        registerCommand(new ELCommand());
+        projector = new Projector(this);
+        registerListener(new PlayerMoveListener(this), new PlayerConnectionListener(this));
+        registerCommands(new ELCommand(this), new LightCommand(this));
 
         File file = new File(getDataFolder() + "/config.yml");
         if (!file.exists()) {
@@ -83,9 +71,9 @@ public class EternalLight extends JavaPlugin {
     /**
      * @return if the server version is 1.8 or below.
      */
-    public boolean isLegacy() {
+    private boolean isLegacy() {
         byte[] ver = ReflectionUtil.getVersionUnsafe();
-        return ver.length > 1 && ver[1] <= 8;
+        return ver.length > 1 && ver[1] <= 13;
     }
 
     public Projector getProjector() {
@@ -100,29 +88,18 @@ public class EternalLight extends JavaPlugin {
         return versionMeta;
     }
 
-    /**
-     * Register a single or list of commands. This saves you from having to
-     * use the plugin.yml to register each command.
-     *
-     * @param commands what command(s) to register.
-     */
-    public static void registerCommand(Command... commands) {
-        try {
-            Field f = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            if (!f.isAccessible()) {
-                f.setAccessible(true);
-            }
-            CommandMap map = (CommandMap) f.get(Bukkit.getServer());
-            for (Command cmd : commands) {
-                map.register(PluginData.NAME, cmd);
-                map.getCommand(cmd.getName()).setAliases(cmd.getAliases());
-                map.getCommand(cmd.getName()).setDescription(cmd.getDescription());
-                map.getCommand(cmd.getName()).setUsage(cmd.getUsage());
-                map.getCommand(cmd.getName()).setPermission(cmd.getPermission());
-                map.getCommand(cmd.getName()).setPermissionMessage(cmd.getPermissionMessage());
-            }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+    private void registerCommands(EternalCommand... commands) {
+        for (EternalCommand cmd : commands) {
+            PluginCommand pc = Bukkit.getPluginCommand(cmd.getName());
+            if (pc == null) continue;
+            pc.setExecutor(cmd);
+            pc.setTabCompleter(cmd);
         }
+    }
+
+    private void registerListener(Listener... listeners) {
+        PluginManager manager = Bukkit.getPluginManager();
+        for (Listener l : listeners)
+            manager.registerEvents(l, this);
     }
 }

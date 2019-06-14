@@ -1,10 +1,12 @@
-package net.axeora.eternallight.handle;
+package me.masstrix.eternallight.handle;
 
-import net.axeora.eternallight.EternalLight;
-import net.axeora.eternallight.EternalLightConfig;
-import net.axeora.eternallight.util.RGBParticle;
+import me.masstrix.eternallight.EternalLightConfig;
+import me.masstrix.eternallight.util.RGBParticle;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.*;
 import org.bukkit.entity.Player;
 
 import java.awt.Color;
@@ -13,14 +15,17 @@ import java.util.*;
 public class LightVisual {
 
     private final UUID PLAYER_UUID;
+    private Projector projector;
     private Player player;
     private boolean enabled = false;
-    private DisplayMethod type = DisplayMethod.NORMAL;
-    private EternalLightConfig config = EternalLight.getInstance().getPluginConfig();
+    private DisplayMethod type = DisplayMethod.SPAWNABLE;
+    private EternalLightConfig config;
 
-    public LightVisual(UUID uuid) {
+    public LightVisual(Projector projector, UUID uuid) {
+        this.projector = projector;
         PLAYER_UUID = uuid;
         player = Bukkit.getPlayer(uuid);
+        config = projector.plugin.getPluginConfig();
     }
 
     /**
@@ -89,32 +94,38 @@ public class LightVisual {
 
     private void send() {
         if (this.player == null) {
-            EternalLight.getInstance().getProjector().remove(PLAYER_UUID);
+            projector.remove(PLAYER_UUID);
             return;
         }
         Location loc = player.getLocation().clone();
         World world = loc.getWorld();
         int px = loc.getBlockX(), py = loc.getBlockY(), pz = loc.getBlockZ();
-        int RAD = config.getRadius();
-        for (int z = -RAD; z <= RAD; z++) {
-            for (int x = -RAD; x <= RAD; x++) {
-                for (int y = -RAD; y <= RAD; y++) {
+        int rad = config.getRadius();
+
+        for (int z = -rad; z <= rad; z++) {
+            for (int x = -rad; x <= rad; x++) {
+                for (int y = -rad; y <= rad; y++) {
+                    if(Math.sqrt((x * x) + (y * y) + (z * z)) > rad) continue;
+                    //if (x * x + y * y + z * z < rad * rad) continue;
+                    assert world != null;
                     Block block = world.getBlockAt(px + x, py + y, pz + z);
-                    Material type = block.getType();
-                    if (type == Material.AIR  || block.isLiquid()) continue;
-                    if (block.getType() == Material.SNOW && block.getData() < 7) continue;
-                    int opacity = getBlockOpacity(type);
-                    if (opacity > 0) continue;
-                    if (!isStairInSpawnRotation(block)) continue;
-                    if (getBlockHeight(block) == 0.5) continue;
+                    SpawnValue spawnValue = SpawnValue.get(block);
+                    BlockData blockData = block.getBlockData();
+
+                    // Update for stairs
+                    if (blockData instanceof Stairs) {
+                        if (isStairInSpawnRotation(block)) spawnValue = SpawnValue.ALWAYS;
+                        else continue;
+                    }
+                    if (spawnValue != SpawnValue.ALWAYS) continue;
 
                     // Validate if there is a 2 block gap above for mobs to spawn.
                     boolean valid = true;
                     for (int yValid = 1; yValid <= 2; yValid++) {
                         Block above = world.getBlockAt(px + x, (py + y) + yValid, pz + z);
                         if (above.getType() == Material.AIR) continue;
-                        int val = getBlockOpacity(above.getType());
-                        if (val == 0 || val == -1 || val == 2) {
+                        SpawnValue sv = SpawnValue.get(above);
+                        if (sv != SpawnValue.TRANSPARENT) {
                             valid = false;
                             break;
                         }
@@ -122,22 +133,26 @@ public class LightVisual {
                     if (!valid) continue;
 
                     Block onTop = world.getBlockAt(px + x, (py + y) + 1, pz + z);
-
                     RGBParticle particle = new RGBParticle();
-                    if (this.type == DisplayMethod.NORMAL) {
+
+                    if (this.type == DisplayMethod.SPAWNABLE) {
                         LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
                         if (spawnCase == LightSpawnCase.NEVER) continue;
                         particle.setColor(spawnCase.color);
-                    }
-                    else if (this.type == DisplayMethod.INCLUSIVE) {
+                    } else if (this.type == DisplayMethod.ALL) {
                         LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
                         particle.setColor(spawnCase.color);
-                    } else if (this.type == DisplayMethod.SMOOTH) {
-                        double lightLevel = onTop.getLightFromBlocks();
+                    } else if (this.type == DisplayMethod.LIGHTLEVEL) {
+                        float p = (float) onTop.getLightFromBlocks() / 14F;
+                        Color c = new Color(255, 0, 6);
 
-                        double p = lightLevel / 14;
-                        particle.setRed(lightLevel > 10 ? (1D - ((lightLevel - 10)  / 4D)) : 1D);
-                        particle.setGreen(p);
+                        // Get saturation and brightness.
+                        float[] hsbVals = new float[3];
+                        Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsbVals);
+
+                        // Shift the hue around by 25%
+                        c = new Color(Color.HSBtoRGB((0.25f * p), hsbVals[1], hsbVals[2]));
+                        particle.setColor(c);
                     }
                     particle.send(player, (px + x) + 0.5, (py + y) + getBlockHeight(block) + 0.2, (pz + z) + 0.5);
                 }
@@ -145,36 +160,28 @@ public class LightVisual {
         }
     }
 
-    private int getBlockOpacity(Material material) {
-        String n = material.name().toLowerCase();
-        Set<ListItem> blocks = EternalLight.getInstance().getAPI().getBlocks();
-        for (ListItem s : blocks) {
-            if (n.contains(s.getTag().toLowerCase())) {
-                return s.getLevel();
-            }
-        }
-        return -1;
-    }
-
+    /**
+     * @param block block to get height of.
+     * @return the height of the given block.
+     */
     private double getBlockHeight(Block block) {
-        Material material = block.getType();
-        String n = material.name().toLowerCase();
-        byte data = block.getData();
-        if (!n.contains("double") && (n.contains("step") || n.contains("slab"))) {
-            if (data < 8) return .5;
+        BlockData data = block.getBlockData();
+        if (data instanceof Slab) {
+            Slab slab = (Slab) data;
+            return slab.getType() == Slab.Type.BOTTOM ? 0.5 : 1;
+        }
+        else if (data instanceof Snow) {
+            Snow snow = (Snow) data;
+            return (double) snow.getLayers() / (double) snow.getMaximumLayers();
         }
         return 1;
     }
 
     private boolean isStairInSpawnRotation(Block block) {
-        String n = block.getType().name();
-        byte data = block.getData();
-        if (n.toLowerCase().contains("stairs")) {
-            byte[] valid = EternalLight.getInstance().getAPI().getValidStairRotations();
-            for (byte b : valid)
-                if (data == b) return true;
-        } else {
-            return true;
+        BlockData data = block.getBlockData();
+        if (data instanceof Stairs) {
+            Stairs stair = (Stairs) data;
+            return stair.getHalf() == Bisected.Half.TOP;
         }
         return false;
     }

@@ -1,7 +1,7 @@
-package net.axeora.eternallight.listener;
+package me.masstrix.eternallight.listener;
 
-import net.axeora.eternallight.EternalLight;
-import net.axeora.eternallight.handle.Projector;
+import me.masstrix.eternallight.EternalLight;
+import me.masstrix.eternallight.handle.Projector;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -9,6 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerMoveListener implements Listener {
+
+    private EternalLight plugin;
+
+    public PlayerMoveListener(EternalLight plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void on(PlayerMoveEvent event) {
@@ -22,7 +28,7 @@ public class PlayerMoveListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        Projector projector = EternalLight.getInstance().getProjector();
+        Projector projector = plugin.getProjector();
         if (projector.canSee(player) && projector.getVisual(player).isEnabled()) {
             projector.getVisual(player).update();
         }

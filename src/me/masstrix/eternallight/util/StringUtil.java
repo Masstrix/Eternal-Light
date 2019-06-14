@@ -1,4 +1,4 @@
-package net.axeora.eternallight.util;
+package me.masstrix.eternallight.util;
 
 import org.bukkit.ChatColor;
 

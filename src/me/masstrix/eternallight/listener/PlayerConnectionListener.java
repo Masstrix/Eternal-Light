@@ -1,9 +1,9 @@
-package net.axeora.eternallight.listener;
+package me.masstrix.eternallight.listener;
 
-import net.axeora.eternallight.EternalLight;
-import net.axeora.eternallight.PluginData;
-import net.axeora.eternallight.util.StringUtil;
-import net.axeora.eternallight.util.VersionChecker;
+import me.masstrix.eternallight.EternalLight;
+import me.masstrix.eternallight.PluginData;
+import me.masstrix.eternallight.util.StringUtil;
+import me.masstrix.eternallight.util.VersionChecker;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,12 +12,18 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerConnectionListener implements Listener {
 
+    private EternalLight plugin;
+
+    public PlayerConnectionListener(EternalLight plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void on(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.isOp() || player.hasPermission("eternallight.admin")) {
-            if (EternalLight.getInstance().getPluginConfig().isUpdateNotifications()) {
-                VersionChecker.VersionMeta meta = EternalLight.getInstance().getVersionMeta();
+            if (plugin.getPluginConfig().isUpdateNotifications()) {
+                VersionChecker.VersionMeta meta = plugin.getVersionMeta();
                 if (meta == null) return;
                 if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
                     player.sendMessage(StringUtil.color(
@@ -30,6 +36,6 @@ public class PlayerConnectionListener implements Listener {
 
     @EventHandler
     public void on(PlayerQuitEvent event) {
-        EternalLight.getInstance().getProjector().remove(event.getPlayer());
+        plugin.getProjector().remove(event.getPlayer());
     }
 }
