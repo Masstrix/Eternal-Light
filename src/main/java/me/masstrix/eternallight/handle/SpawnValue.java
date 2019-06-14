@@ -2,6 +2,11 @@ package me.masstrix.eternallight.handle;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.Bisected;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Slab;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.block.data.type.TrapDoor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,6 +31,7 @@ public enum SpawnValue {
     private static Set<BlockKey> nonSolids = new HashSet<>();
 
     static {
+        blocks.add(new BlockKeyMat(Material.SCAFFOLDING, ALWAYS));
         blocks.add(new BlockKeyMat(Material.GLOWSTONE, NEVER));
         blocks.add(new BlockKeyMat(Material.LADDER, NEVER));
         blocks.add(new BlockKeyMat(Material.COBWEB, NEVER));
@@ -55,8 +61,6 @@ public enum SpawnValue {
         blocks.add(new BlockKeyMat(Material.BARRIER, NEVER));
         blocks.add(new BlockKeyMat(Material.GRASS_PATH, NEVER));
         blocks.add(new BlockKeyMat(Material.DRAGON_EGG, NEVER));
-
-        blocks.add(new BlockKeyMat(Material.SCAFFOLDING, ALWAYS));
 
         // Redstone
         blocks.add(new BlockKeyMat(Material.TRIPWIRE, TRANSPARENT));
@@ -102,6 +106,30 @@ public enum SpawnValue {
      * @return the specified value for the block.
      */
     public static SpawnValue get(Block block) {
+        BlockData data = block.getBlockData();
+
+        if (data instanceof TrapDoor) {
+            TrapDoor trapDoor = (TrapDoor) data;
+            if (trapDoor.isOpen()) {
+                return SpawnValue.TRANSPARENT;
+            } else {
+                if (trapDoor.getHalf() == Bisected.Half.BOTTOM) {
+                    return SpawnValue.NEVER;
+                } else {
+                    return SpawnValue.ALWAYS;
+                }
+            }
+        } else if (data instanceof Stairs) {
+            Stairs stair = (Stairs) data;
+            if (stair.getHalf() == Bisected.Half.TOP) return ALWAYS;
+            else return NEVER;
+        } else if (data instanceof Slab) {
+            Slab slab = (Slab) data;
+            if (slab.getType().equals(Slab.Type.TOP) || slab.getType().equals(Slab.Type.DOUBLE)) return ALWAYS;
+            else return NEVER;
+        }
+
+
         if (!block.getType().isSolid() || block.getType().name().contains("AIR")) {
             for (BlockKey key : nonSolids) {
                 if (key.equals(block)) return key.getValue();

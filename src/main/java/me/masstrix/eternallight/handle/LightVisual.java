@@ -7,12 +7,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Slab;
 import org.bukkit.block.data.type.Snow;
-import org.bukkit.block.data.type.Stairs;
-import org.bukkit.block.data.type.TrapDoor;
 import org.bukkit.entity.Player;
 
 import java.awt.*;
@@ -116,20 +113,6 @@ public class LightVisual {
                     assert world != null;
                     Block block = world.getBlockAt(px + x, py + y, pz + z);
                     SpawnValue spawnValue = SpawnValue.get(block);
-                    BlockData blockData = block.getBlockData();
-
-                    // Update for stairs
-                    if (blockData instanceof Stairs) {
-                        if (isStairInSpawnRotation(block)) spawnValue = SpawnValue.ALWAYS;
-                        else continue;
-                    }
-                    if (blockData instanceof Slab) {
-                        if(isSlabHalfTop(block)) spawnValue = SpawnValue.ALWAYS;
-                        else continue;
-                    }
-                    if (blockData instanceof TrapDoor) {
-                        spawnValue = trapDoorSpawnValue(block);
-                    }
                     if (spawnValue != SpawnValue.ALWAYS) continue;
 
                     // Validate if there is a 2 block gap above for mobs to spawn.
@@ -188,39 +171,6 @@ public class LightVisual {
             return (double) snow.getLayers() / (double) snow.getMaximumLayers();
         }
         return 1;
-    }
-
-    private boolean isStairInSpawnRotation(Block block) {
-        BlockData data = block.getBlockData();
-        if (data instanceof Stairs) {
-            Stairs stair = (Stairs) data;
-            return stair.getHalf() == Bisected.Half.TOP;
-        }
-        return false;
-    }
-
-    private boolean isSlabHalfTop(Block block) {
-        BlockData data = block.getBlockData();
-        if (data instanceof Slab) {
-            Slab slab = (Slab) data;
-            return slab.getType().equals(Slab.Type.TOP) || slab.getType().equals(Slab.Type.DOUBLE);
-        }
-        return false;
-    }
-
-    private SpawnValue trapDoorSpawnValue(Block block) {
-        BlockData data = block.getBlockData();
-        TrapDoor trapDoor = (TrapDoor) data;
-
-        if (trapDoor.isOpen()) {
-            return SpawnValue.TRANSPARENT;
-        } else {
-            if (trapDoor.getHalf() == Bisected.Half.BOTTOM) {
-                return SpawnValue.NEVER;
-            } else {
-                return SpawnValue.ALWAYS;
-            }
-        }
     }
 
     private enum LightSpawnCase {
