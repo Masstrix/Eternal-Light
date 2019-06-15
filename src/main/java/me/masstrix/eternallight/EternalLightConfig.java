@@ -23,7 +23,7 @@ public class EternalLightConfig {
     config.set(defaultDisplay, type.name());
 
     String update = "general.update-notifications";
-    updates = !config.contains(update) || config.getBoolean(update);
+    updates = config.getBoolean(update, true);
     config.set(update, updates);
 
     save();

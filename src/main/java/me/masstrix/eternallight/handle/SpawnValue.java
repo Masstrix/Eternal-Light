@@ -82,6 +82,7 @@ public enum SpawnValue {
     blocks.add(new BlockKeyMat(Material.SEA_PICKLE, TRANSPARENT));
 
     blocks.add(new BlockKeyMatch("(.*)chest", NEVER));
+    blocks.add(new BlockKeyMatch("(.*)_anvil", NEVER));
     blocks.add(new BlockKeyMatch("(.*)fence", NEVER));
     blocks.add(new BlockKeyMatch("(.*)bed", NEVER));
     blocks.add(new BlockKeyMatch("(.*)leaves", NEVER));
