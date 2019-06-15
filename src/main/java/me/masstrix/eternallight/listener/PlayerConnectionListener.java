@@ -12,30 +12,30 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerConnectionListener implements Listener {
 
-    private EternalLight plugin;
+  private EternalLight plugin;
 
-    public PlayerConnectionListener(EternalLight plugin) {
-        this.plugin = plugin;
-    }
+  public PlayerConnectionListener(EternalLight plugin) {
+    this.plugin = plugin;
+  }
 
-    @EventHandler
-    public void on(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (player.isOp() || player.hasPermission("eternallight.admin")) {
-            if (plugin.getPluginConfig().isUpdateNotifications()) {
-                VersionChecker.VersionMeta meta = plugin.getVersionMeta();
-                if (meta == null) return;
-                if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
-                    player.sendMessage(StringUtil.color(
-                            PluginData.PREFIX + "&bA newer version is available. " +
-                            "Update now to get new features and bug patch's."));
-                }
-            }
+  @EventHandler
+  public void on(PlayerJoinEvent event) {
+    Player player = event.getPlayer();
+    if (player.isOp() || player.hasPermission("eternallight.admin")) {
+      if (plugin.getPluginConfig().isUpdateNotifications()) {
+        VersionChecker.VersionMeta meta = plugin.getVersionMeta();
+        if (meta == null) return;
+        if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
+          player.sendMessage(StringUtil.color(
+                  PluginData.PREFIX + "&bA newer version is available. " +
+                          "Update now to get new features and bug patch's."));
         }
+      }
     }
+  }
 
-    @EventHandler
-    public void on(PlayerQuitEvent event) {
-        plugin.getProjector().remove(event.getPlayer());
-    }
+  @EventHandler
+  public void on(PlayerQuitEvent event) {
+    plugin.getProjector().remove(event.getPlayer());
+  }
 }

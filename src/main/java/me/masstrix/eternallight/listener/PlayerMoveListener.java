@@ -12,27 +12,27 @@ import java.util.Objects;
 
 public class PlayerMoveListener implements Listener {
 
-    private EternalLight plugin;
+  private EternalLight plugin;
 
-    public PlayerMoveListener(EternalLight plugin) {
-        this.plugin = plugin;
+  public PlayerMoveListener(EternalLight plugin) {
+    this.plugin = plugin;
+  }
+
+  @EventHandler
+  public void on(PlayerMoveEvent event) {
+    Location from = event.getFrom();
+    Location to = event.getTo();
+
+    if (from.getBlockX() == Objects.requireNonNull(to).getBlockX()
+            || from.getBlockZ() == to.getBlockZ()
+            || from.getBlockY() == to.getBlockY()) {
+      return;
     }
 
-    @EventHandler
-    public void on(PlayerMoveEvent event) {
-        Location from = event.getFrom();
-        Location to = event.getTo();
-
-        if (from.getBlockX() == Objects.requireNonNull(to).getBlockX()
-                || from.getBlockZ() == to.getBlockZ()
-                || from.getBlockY() == to.getBlockY()) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        Projector projector = plugin.getProjector();
-        if (projector.canSee(player) && projector.getVisual(player).isEnabled()) {
-            projector.getVisual(player).update();
-        }
+    Player player = event.getPlayer();
+    Projector projector = plugin.getProjector();
+    if (projector.canSee(player) && projector.getVisual(player).isEnabled()) {
+      projector.getVisual(player).update();
     }
+  }
 }

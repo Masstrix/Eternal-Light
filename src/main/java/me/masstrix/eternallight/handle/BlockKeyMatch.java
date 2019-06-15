@@ -6,21 +6,21 @@ import java.util.regex.Pattern;
 
 public class BlockKeyMatch implements BlockKey {
 
-    private Pattern pattern;
-    private SpawnValue value;
+  private Pattern pattern;
+  private SpawnValue value;
 
-    BlockKeyMatch(String pattern, SpawnValue value) {
-        this.pattern = Pattern.compile(pattern);
-        this.value = value;
-    }
+  BlockKeyMatch(String pattern, SpawnValue value) {
+    this.pattern = Pattern.compile(pattern);
+    this.value = value;
+  }
 
-    @Override
-    public boolean equals(Block block) {
-        return block != null && pattern.matcher(block.getType().name().toLowerCase()).matches();
-    }
+  @Override
+  public boolean equals(Block block) {
+    return block != null && pattern.matcher(block.getType().name().toLowerCase()).matches();
+  }
 
-    @Override
-    public SpawnValue getValue() {
-        return value;
-    }
+  @Override
+  public SpawnValue getValue() {
+    return value;
+  }
 }

@@ -8,55 +8,56 @@ import java.awt.*;
 
 public class RGBParticle {
 
-    private int r = 0, g = 0, b = 0;
+  private int r = 0, g = 0, b = 0;
 
-    public RGBParticle() {}
+  public RGBParticle() {
+  }
 
-    public RGBParticle(int r, int g, int b) {
-        setColor(r, g, b);
-    }
+  public RGBParticle(int r, int g, int b) {
+    setColor(r, g, b);
+  }
 
-    public RGBParticle(Color color) {
-        setColor(color);
-    }
+  public RGBParticle(Color color) {
+    setColor(color);
+  }
 
-    public void setColor(Color color) {
-        r = color.getRed();
-        g = color.getGreen();
-        b = color.getBlue();
-    }
+  public void setColor(Color color) {
+    r = color.getRed();
+    g = color.getGreen();
+    b = color.getBlue();
+  }
 
-    private void setColor(int r, int g, int b) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-    }
+  private void setColor(int r, int g, int b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
 
-    public void setRed(int r) {
-        this.r = r;
-        if (this.r > 255) this.r = 255;
-    }
+  public void setRed(int r) {
+    this.r = r;
+    if (this.r > 255) this.r = 255;
+  }
 
-    public void setGreen(int g) {
-        this.g = g;
-        if (this.g > 255) this.g = 255;
-    }
+  public void setGreen(int g) {
+    this.g = g;
+    if (this.g > 255) this.g = 255;
+  }
 
-    public void setBlue(int b) {
-        this.b = b;
-        if (this.b > 255) this.b = 255;
-    }
+  public void setBlue(int b) {
+    this.b = b;
+    if (this.b > 255) this.b = 255;
+  }
 
-    public void send(Player player, double x, double y, double z) {
-        display(player, new Location(player.getWorld(), x, y, z));
-    }
+  public void send(Player player, double x, double y, double z) {
+    display(player, new Location(player.getWorld(), x, y, z));
+  }
 
-    private void display(Player player, Location loc) {
-        player.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(org.bukkit.Color.fromRGB(r, g, b), 1));
-    }
+  private void display(Player player, Location loc) {
+    player.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(org.bukkit.Color.fromRGB(r, g, b), 1));
+  }
 
-    @Override
-    public String toString() {
-        return String.format("[%d, %d, %d]", r, g, b);
-    }
+  @Override
+  public String toString() {
+    return String.format("[%d, %d, %d]", r, g, b);
+  }
 }
