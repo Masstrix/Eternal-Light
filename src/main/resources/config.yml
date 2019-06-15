@@ -18,7 +18,6 @@
 general:
   update-notifications: true
   default-display-type: ALL
-  check-gap: true
 
 # What the radius of the projector is. Best kept small (0 - 7) to improve performance.
 # Range is capped at 12.

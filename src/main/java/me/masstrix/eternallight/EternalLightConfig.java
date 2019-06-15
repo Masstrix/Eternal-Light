@@ -11,7 +11,6 @@ public class EternalLightConfig {
   private int rad;
   private DisplayMethod type;
   private boolean updates = true;
-  private boolean checkGap;
 
   void init(EternalLight plugin) {
     this.plugin = plugin;
@@ -19,18 +18,15 @@ public class EternalLightConfig {
 
     setRadius(config.getInt("radius", 5));
 
-    String gap = "general.check-gap";
-    checkGap = config.getBoolean(gap, true);
-    config.set(gap, checkGap);
-
     String defaultDisplay = "general.default-display-type";
     type = DisplayMethod.find(config.getString(defaultDisplay, "ALL"));
-    config.set(defaultDisplay, type);
-
-    save();
+    config.set(defaultDisplay, type.name());
 
     String update = "general.update-notifications";
     updates = !config.contains(update) || config.getBoolean(update);
+    config.set(update, updates);
+
+    save();
   }
 
   public void reload() {
@@ -60,9 +56,5 @@ public class EternalLightConfig {
 
   public boolean isUpdateNotifications() {
     return updates;
-  }
-
-  public boolean checkGap() {
-    return checkGap;
   }
 }

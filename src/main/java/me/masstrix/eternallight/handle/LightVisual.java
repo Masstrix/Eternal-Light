@@ -117,19 +117,17 @@ public class LightVisual {
           if (spawnValue != SpawnValue.ALWAYS) continue;
 
           // Validate if there is a 2 block gap above for mobs to spawn.
-          if (config.checkGap()) {
-            boolean valid = true;
-            for (int yValid = 1; yValid <= 2; yValid++) {
-              Block above = world.getBlockAt(px + x, (py + y) + yValid, pz + z);
-              if (above.getType() == Material.AIR) continue;
-              SpawnValue sv = SpawnValue.get(above);
-              if (sv != SpawnValue.TRANSPARENT) {
-                valid = false;
-                break;
-              }
+          boolean valid = true;
+          for (int yValid = 1; yValid <= 2; yValid++) {
+            Block above = world.getBlockAt(px + x, (py + y) + yValid, pz + z);
+            if (above.getType() == Material.AIR) continue;
+            SpawnValue sv = SpawnValue.get(above);
+            if (sv != SpawnValue.TRANSPARENT) {
+              valid = false;
+              break;
             }
-            if (!valid) continue;
           }
+          if (!valid) continue;
 
           Block onTop = world.getBlockAt(px + x, (py + y) + 1, pz + z);
           RGBParticle particle = new RGBParticle();
