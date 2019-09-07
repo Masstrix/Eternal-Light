@@ -1,35 +1,44 @@
-#    -------------------
-#  E T E R N A L    L I G H T
-#    -------------------
+#     _____  _                        _  __     _       _    _
+#    |   __|| |_  ___  ___  ___  ___ | ||  |   |_| ___ | |_ | |_
+#    |   __||  _|| -_||  _||   || .'|| ||  |__ | || . ||   ||  _|
+#    |_____||_|  |___||_|  |_|_||__,||_||_____||_||_  ||_|_||_|
+#                                                 |___|
+# 
 # Eternal Light is a plugin based from the Not Enough Item's mod light level overlays.
 # Red meaning hostile mobs can spawn at any time; yellow only during night and green
 # meaning that light levels are to high for hostile mobs to spawn.
-#                      ---
+# 
+# PERMISSIONS
+#   eternallight.admin - Allows players to use /el
+#   eternallight.use   - Allows players to use /ll
+#   eternallight.mode  - Allows players to use /ll mode and /ll help. If they do not have this 
+#                        permission they will only be able to use the default display mode.
+# 
 # COMMANDS
 #   /el or /eternallight - (eternallight.admin) Displays admin command.
-#   /lightlevels or /showlight or /ll - (eternallight.use) Enables the light overlay.
-#   /lightlevels mode - (eternallight.use) Toggles between active modes.
-#                     ---
-# MODES:
-#   SPAWNABLE - Red and yellow areas shown.
-#   ALL - Red, yellow and green areas shown.
+#   /lightlevels or /ll  - (eternallight.use) Enables the light overlay.
+#   /lightlevels mode    - (eternallight.use) Toggles between active modes.
+# 
+# MODES
+#   SPAWNABLE  - Red and yellow areas shown.
+#   ALL        - Red, yellow and green areas shown.
 #   LIGHTLEVEL - All areas show like ALL mode but smoothed.
-#                      ---
-version: 2
-
-general:
-  update-notifications: true
-
-# What the radius of the projector is. Best kept small (0 - 7) to improve performance.
-# Range is capped at 12.
+# 
+# EXPLANATIONS
+#   radius           - Sets the radius players can see light levels in. It's advised to keep this
+#                      lower as it adds exponentially more load on the server the larger it is.
+#   default-mode     - Default mode used for when players first toggle on the display.
+#   messages.enabled - If false players will not see activate, deactivate and change-mode messages.
+# 
+update-notifications: true
 radius: 5
-
-# Used as the default mode for when players first enabled it.
 default-mode: SPAWNABLE
-
 messages:
-  prefix: "&e&l[EternalLight] &f"
+  enabledd: true
   use-prefix: true
-  activate: "Enabled the light level projector. &7Use /ll mode to toggle between display modes."
-  deactivate: "Disabled light level projector."
+  prefix: "&e&l[EternalLight] &f"
+  activate: "&aEnabled&f the light level projector. &7Use /ll mode to toggle between display modes."
+  deactivate: "&cDisabled&f light level projector."
   change-mode: "Set display mode to &7%mode%"
+  no-permission: "&cYou do not have permission to do this!"
+  invalid-mode: "&cInvalid display mode!"

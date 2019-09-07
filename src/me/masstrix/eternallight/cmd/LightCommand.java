@@ -1,15 +1,13 @@
 package me.masstrix.eternallight.cmd;
 
+import me.masstrix.eternallight.EternalLightConfig;
 import me.masstrix.eternallight.handle.DisplayMethod;
 import me.masstrix.eternallight.handle.LightVisual;
 import me.masstrix.eternallight.handle.Projector;
 import me.masstrix.eternallight.EternalLight;
-import me.masstrix.eternallight.PluginData;
 import me.masstrix.eternallight.util.EternalCommand;
-import me.masstrix.eternallight.util.StringUtil;
-import org.bukkit.Bukkit;
+import me.masstrix.eternallight.util.Perm;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -28,45 +26,56 @@ public class LightCommand extends EternalCommand {
     @Override
     public void execute(String[] args) {
         if (!wasPlayer()) {
-            Bukkit.getConsoleSender().sendMessage(StringUtil.color(
-                    "[" + PluginData.NAME + "] &cOnly players can use this command!"));
+            plugin.getLogger().info("Only players can use this command!");
             return;
         }
         Player player = (Player) getSender();
         Projector projector = plugin.getProjector();
+        EternalLightConfig config = plugin.getPluginConfig();
+
         if (!projector.contains(player.getUniqueId())) projector.add(player);
         if (args.length > 0) {
-            if (args[0].equalsIgnoreCase("help")) {
+            if (args[0].equalsIgnoreCase("help") && player.hasPermission(Perm.MODE)
+                    && config.isMessagesEnabled()) {
                 msg("");
                 msg("&e/lightlevels &7-&f Toggle light indicators.");
                 msg("&e/lightlevels mode [mode] &7-&f Change display mode.");
                 msg("");
             }
             else if (args[0].equalsIgnoreCase("mode")) {
+                if (!player.hasPermission(Perm.MODE)) {
+                    msg(player, config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.NO_PERMISSION));
+                    return;
+                }
                 LightVisual visual = projector.getVisual(player);
                 if (args.length > 1) {
                     DisplayMethod method = DisplayMethod.find(args[1]);
                     if (method == null) {
-                        msg(PluginData.PREFIX + "&cInvalid display mode!");
+                        msg(config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.INVALID_MODE));
                         return;
                     }
-                    visual.setType(method);
+                    visual.setMethod(method);
                 } else {
                     visual.toggleType();
                 }
-                msg(PluginData.PREFIX + "Toggled display mode to " + visual.getType());
+                if (config.isMessagesEnabled())
+                    msg(config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.CHANGE_MODE)
+                            .replaceAll("%mode%", visual.getMethod().toString()));
             }
             return;
         }
-        boolean wasShown = projector.getVisual(player).toggle();
-        msg(StringUtil.color(String.format(
-                PluginData.PREFIX + "%s light level projector.%s",
-                wasShown ? "Disabled" : "Enabled", wasShown ? ""
-                        : " &7Use /" + getLabelUsed() + " mode to toggle between display modes.")));
+        if (config.isMessagesEnabled()) {
+            boolean wasShown = projector.getVisual(player).toggle();
+            String msg;
+            if (wasShown) msg = config.getMessage(EternalLightConfig.ConfigMessage.DISABLE);
+            else msg = config.getMessage(EternalLightConfig.ConfigMessage.ENABLE);
+            msg(config.getPrefix() + msg);
+        }
     }
 
     @Override
-    public List<String> tabComplete(String[] args) {
+    public List<String> tabComplete(CommandSender sender, String[] args) {
+        if (!sender.hasPermission(Perm.MODE)) return Collections.emptyList();
         if (args.length == 1) {
             return Arrays.asList("mode", "help");
         }

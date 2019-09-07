@@ -1,7 +1,7 @@
 package me.masstrix.eternallight.listener;
 
 import me.masstrix.eternallight.EternalLight;
-import me.masstrix.eternallight.PluginData;
+import me.masstrix.eternallight.util.Perm;
 import me.masstrix.eternallight.util.StringUtil;
 import me.masstrix.eternallight.util.VersionChecker;
 import org.bukkit.entity.Player;
@@ -21,15 +21,14 @@ public class PlayerConnectionListener implements Listener {
     @EventHandler
     public void on(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        if (player.isOp() || player.hasPermission("eternallight.admin")) {
-            if (plugin.getPluginConfig().isUpdateNotifications()) {
-                VersionChecker.VersionMeta meta = plugin.getVersionMeta();
-                if (meta == null) return;
-                if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
-                    player.sendMessage(StringUtil.color(
-                            PluginData.PREFIX + "&bA newer version is available. " +
-                            "Update now to get new features and bug patch's."));
-                }
+        if (player.isOp() || player.hasPermission(Perm.ADMIN)
+                && plugin.getPluginConfig().sendUpdateNotifications()) {
+            VersionChecker.VersionMeta meta = plugin.getVersionMeta();
+            if (meta == null) return;
+            if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
+                player.sendMessage(StringUtil.color(
+                        plugin.getPluginConfig().getPrefix() + "&bA newer version is available. " +
+                                "Update now to get new features and bug patch's."));
             }
         }
     }

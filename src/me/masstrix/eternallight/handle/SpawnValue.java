@@ -1,15 +1,18 @@
 package me.masstrix.eternallight.handle;
 
+import me.masstrix.eternallight.EternalLight;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.type.*;
 
+import java.io.*;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public enum SpawnValue {
     /**
-     * Block is ignored in spawning rules. For example Grass, Flowers.
+     * Block is ignored in spawning rules. For example Grass and Flowers.
      */
     TRANSPARENT,
 
@@ -19,88 +22,82 @@ public enum SpawnValue {
     NEVER,
 
     /**
-     * Block is can have mobs spawn on it.
+     * Block can have mobs spawn on it.
      */
     ALWAYS;
 
-    private static Set<BlockKey> blocks = new HashSet<>();
-    private static Set<BlockKey> nonSolids = new HashSet<>();
+    public static SpawnValue findOrDefault(String s, SpawnValue def) {
+        for (SpawnValue v : values()) {
+            if (v.name().equalsIgnoreCase(s)) return v;
+        }
+        return def;
+    }
 
-    static {
-        blocks.add(new BlockKeyMat(Material.GLOWSTONE, NEVER));
-        blocks.add(new BlockKeyMat(Material.LADDER, NEVER));
-        blocks.add(new BlockKeyMat(Material.COBWEB, NEVER));
-        blocks.add(new BlockKeyMat(Material.CAKE, NEVER));
-        blocks.add(new BlockKeyMat(Material.END_PORTAL_FRAME, NEVER));
-        blocks.add(new BlockKeyMat(Material.END_CRYSTAL, NEVER));
-        blocks.add(new BlockKeyMat(Material.END_PORTAL, NEVER));
-        blocks.add(new BlockKeyMat(Material.CAKE, NEVER));
-        blocks.add(new BlockKeyMat(Material.LANTERN, NEVER));
-        blocks.add(new BlockKeyMat(Material.SCAFFOLDING, NEVER));
-        blocks.add(new BlockKeyMat(Material.CAKE, NEVER));
+    private static Map<Material, SpawnValue> mapping = new HashMap<>();
 
-        blocks.add(new BlockKeyMat(Material.BELL, NEVER));
-        blocks.add(new BlockKeyMat(Material.GRINDSTONE, NEVER));
-        blocks.add(new BlockKeyMat(Material.SMOKER, NEVER));
-        blocks.add(new BlockKeyMat(Material.LOOM, NEVER));
-        blocks.add(new BlockKeyMat(Material.ANVIL, NEVER));
-        blocks.add(new BlockKeyMat(Material.BARREL, NEVER));
-        blocks.add(new BlockKeyMat(Material.FURNACE, NEVER));
-        blocks.add(new BlockKeyMat(Material.BLAST_FURNACE, NEVER));
-        blocks.add(new BlockKeyMat(Material.COMPOSTER, NEVER));
+    /**
+     * Reads the mapping.txt file in the plugins folder and applies them to each material in the game.
+     * This saves on computation time when rendering light levels.
+     *
+     * @param plugin plugin instance.
+     * @return if the mappings were successfully loaded and applied.
+     */
+    public static boolean loadMappings(EternalLight plugin) {
+        plugin.getLogger().info("Loading material mappings...");
 
-        // Redstone
-        blocks.add(new BlockKeyMat(Material.TRIPWIRE, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.TRIPWIRE_HOOK, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.DAYLIGHT_DETECTOR, TRANSPARENT));
+        Set<MaterialMatcher> blocks = new HashSet<>();
+        AtomicInteger loadedMappings = new AtomicInteger(0);
 
-        // Greens
-        blocks.add(new BlockKeyMat(Material.MYCELIUM, NEVER));
-        blocks.add(new BlockKeyMat(Material.FLOWER_POT, NEVER));
-        blocks.add(new BlockKeyMat(Material.VINE, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.RED_MUSHROOM, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.BROWN_MUSHROOM, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.GRASS, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.TALL_GRASS, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.FERN, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.LARGE_FERN, TRANSPARENT));
-        blocks.add(new BlockKeyMat(Material.CACTUS, NEVER));
-        blocks.add(new BlockKeyMat(Material.COCOA, NEVER));
-        blocks.add(new BlockKeyMat(Material.SEA_PICKLE, TRANSPARENT));
+        try {
+            // Get mappings file
+            File mappingsFile = new File(plugin.getDataFolder(), "mapping.txt");
+            if (!mappingsFile.exists()) {
+                plugin.saveResource("mapping.txt", false);
+            }
 
-        blocks.add(new BlockKeyMatch("(.*)chest", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)fence", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)slab", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)bed", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)leaves", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)pressure_plate", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)door", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)sign", TRANSPARENT));
-        blocks.add(new BlockKeyMatch("(.*)coral", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)_table", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)glass(.*)", NEVER));
-        blocks.add(new BlockKeyMatch("(.*)wall(.*)", NEVER));
+            // Read and load mappings
+            BufferedReader reader = new BufferedReader(new FileReader(mappingsFile));
+            reader.lines().forEach(line -> {
+                line = line.replaceAll(" ", "");
+                String[] v = line.split(":");
+                blocks.add(new MaterialMatcher(v[0].replaceAll("\\*", "(.*)"), findOrDefault(v[1], ALWAYS)));
+                loadedMappings.incrementAndGet();
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
 
-        nonSolids.add(new BlockKeyMatch("(.*)carpet", NEVER));
-        nonSolids.add(new BlockKeyMatch("potted(.*)", NEVER));
-        nonSolids.add(new BlockKeyMat(Material.FLOWER_POT, NEVER));
-        nonSolids.add(new BlockKeyMat(Material.SNOW, ALWAYS));
+        // Cache materials to a mapping
+        for (Material mat : Material.values()) {
+            if (mat.name().startsWith("LEGACY")) continue; // Ignore legacy stuff
+            if (mat.name().contains("AIR")) {
+                mapping.put(mat, TRANSPARENT);
+                continue;
+            } else {
+                boolean found = false;
+                for (MaterialMatcher key : blocks) {
+                    if (key.equals(mat)) {
+                        found = true;
+                        mapping.put(mat, key.getValue());
+                        break;
+                    }
+                }
+                if (found) continue;
+            }
+            mapping.put(mat, ALWAYS);
+        }
+
+        blocks.clear();
+        plugin.getLogger().info(String.format("Loaded and applied %s mappings", loadedMappings.get()));
+        return true;
     }
 
     /**
-     * @param block block type to check for.
+     * @param material material to check for.
      * @return the specified value for the block.
      */
-    public static SpawnValue get(Block block) {
-        if (!block.getType().isSolid() || block.getType().name().contains("AIR")) {
-            for (BlockKey key : nonSolids) {
-                if (key.equals(block)) return key.getValue();
-            }
-            return TRANSPARENT;
-        }
-        for (BlockKey key : blocks) {
-            if (key.equals(block)) return key.getValue();
-        }
-        return ALWAYS;
+    public static SpawnValue get(Material material) {
+        return mapping.getOrDefault(material, ALWAYS);
     }
 }

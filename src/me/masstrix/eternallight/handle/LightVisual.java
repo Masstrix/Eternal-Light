@@ -18,7 +18,7 @@ public class LightVisual {
     private Projector projector;
     private Player player;
     private boolean enabled = false;
-    private DisplayMethod type = DisplayMethod.SPAWNABLE;
+    private DisplayMethod method;
     private EternalLightConfig config;
 
     public LightVisual(Projector projector, UUID uuid) {
@@ -26,6 +26,7 @@ public class LightVisual {
         PLAYER_UUID = uuid;
         player = Bukkit.getPlayer(uuid);
         config = projector.plugin.getPluginConfig();
+        method = config.getDefaultMode();
     }
 
     /**
@@ -72,24 +73,24 @@ public class LightVisual {
     /**
      * Sets the display type of the projector.
      *
-     * @param type what display method will be used to render light levels.
+     * @param method what display method will be used to render light levels.
      */
-    public void setType(DisplayMethod type) {
-        this.type = type;
+    public void setMethod(DisplayMethod method) {
+        this.method = method;
     }
 
     /**
      * Toggle between display modes.
      */
     public void toggleType() {
-        this.type = type.next();
+        this.method = method.next();
     }
 
     /**
      * @return the current display method being used.
      */
-    public DisplayMethod getType() {
-        return type;
+    public DisplayMethod getMethod() {
+        return method;
     }
 
     private void send() {
@@ -102,6 +103,8 @@ public class LightVisual {
         int px = loc.getBlockX(), py = loc.getBlockY(), pz = loc.getBlockZ();
         int rad = config.getRadius();
 
+        RGBParticle particle = new RGBParticle(0, 0, 0);
+
         for (int z = -rad; z <= rad; z++) {
             for (int x = -rad; x <= rad; x++) {
                 for (int y = -rad; y <= rad; y++) {
@@ -109,8 +112,10 @@ public class LightVisual {
                     //if (x * x + y * y + z * z < rad * rad) continue;
                     assert world != null;
                     Block block = world.getBlockAt(px + x, py + y, pz + z);
-                    SpawnValue spawnValue = SpawnValue.get(block);
+                    SpawnValue spawnValue = SpawnValue.get(block.getType());
                     BlockData blockData = block.getBlockData();
+
+                    if (block.isPassable()) continue;
 
                     // Update for stairs
                     if (blockData instanceof Stairs) {
@@ -123,8 +128,9 @@ public class LightVisual {
                     boolean valid = true;
                     for (int yValid = 1; yValid <= 2; yValid++) {
                         Block above = world.getBlockAt(px + x, (py + y) + yValid, pz + z);
-                        if (above.getType() == Material.AIR) continue;
-                        SpawnValue sv = SpawnValue.get(above);
+                        if (above.getType() == Material.AIR || above.getType() == Material.CAVE_AIR) continue;
+                        if (above.isPassable()) continue;
+                        SpawnValue sv = SpawnValue.get(above.getType());
                         if (sv != SpawnValue.TRANSPARENT) {
                             valid = false;
                             break;
@@ -133,16 +139,15 @@ public class LightVisual {
                     if (!valid) continue;
 
                     Block onTop = world.getBlockAt(px + x, (py + y) + 1, pz + z);
-                    RGBParticle particle = new RGBParticle();
 
-                    if (this.type == DisplayMethod.SPAWNABLE) {
+                    if (this.method == DisplayMethod.SPAWNABLE) {
                         LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
                         if (spawnCase == LightSpawnCase.NEVER) continue;
                         particle.setColor(spawnCase.color);
-                    } else if (this.type == DisplayMethod.ALL) {
+                    } else if (this.method == DisplayMethod.ALL) {
                         LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
                         particle.setColor(spawnCase.color);
-                    } else if (this.type == DisplayMethod.LIGHTLEVEL) {
+                    } else if (this.method == DisplayMethod.LIGHTLEVEL) {
                         float p = (float) onTop.getLightFromBlocks() / 14F;
                         Color c = new Color(255, 0, 6);
 

@@ -52,7 +52,8 @@ public class RGBParticle {
     }
 
     public void display(Player player, Location loc) {
-        player.spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(org.bukkit.Color.fromRGB(r, g, b), 1));
+        // 1.14 / 1.13
+        player.spawnParticle(Particle.REDSTONE, loc, 1, new Particle.DustOptions(org.bukkit.Color.fromRGB(r, g, b), 1));
     }
 
     @Override

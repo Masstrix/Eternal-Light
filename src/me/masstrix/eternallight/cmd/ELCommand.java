@@ -1,10 +1,9 @@
 package me.masstrix.eternallight.cmd;
 
 import me.masstrix.eternallight.EternalLight;
+import me.masstrix.eternallight.handle.SpawnValue;
 import me.masstrix.eternallight.util.EternalCommand;
 import me.masstrix.eternallight.util.VersionChecker;
-import me.masstrix.eternallight.PluginData;
-import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,13 +29,14 @@ public class ELCommand extends EternalCommand {
                 msg("");
             }
             msg("&e/" + getLabelUsed() + " reload &7-&f Reloads the plugins config file.");
+            msg("&e/" + getLabelUsed() + " reloadMappings &7-&f Reloads and applies the mappings.");
             msg("&e/" + getLabelUsed() + " version &7-&f Checks for any updates.");
             msg("&e/" + getLabelUsed() + " renderdistance <distance> &7-&f Changes the render distance.");
             msg("");
         } else {
             if (args[0].equalsIgnoreCase("reload")) {
                 plugin.getPluginConfig().reload();
-                msg(PluginData.PREFIX + "&7Reloaded config.");
+                msg(plugin.getPluginConfig().getPrefix() + "&aReloaded config.");
                 return;
             }
             else if (args[0].equalsIgnoreCase("renderdistance")) {
@@ -48,13 +48,21 @@ public class ELCommand extends EternalCommand {
                 if (str.matches("\\d.*")) {
                     plugin.getPluginConfig().setRadius(Integer.parseInt(str));
                     plugin.getPluginConfig().save();
-                    msg(PluginData.PREFIX + "set render distance to " + plugin.getPluginConfig().getRadius());
+                    msg(plugin.getPluginConfig().getPrefix() + "set render distance to " + plugin.getPluginConfig().getRadius());
                 }
                 return;
             }
+            else if (args[0].equalsIgnoreCase("reloadMappings")) {
+                boolean success = SpawnValue.loadMappings(plugin);
+                if (success)
+                    msg(plugin.getPluginConfig().getPrefix() + "&aReloaded mappings.");
+                else msg(plugin.getPluginConfig().getPrefix() + "&cThere was an error while reloading the mappings. " +
+                        "Please make sure your mappings are valid.");
+                return;
+            }
             else if (args[0].equalsIgnoreCase("version")) {
-                msg(PluginData.PREFIX + "&7Checking version...");
-                VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, plugin.getVersion());
+                msg(plugin.getPluginConfig().getPrefix() + "&7Checking version...");
+                VersionChecker checker = new VersionChecker(EternalLight.RESOURCE_ID, plugin.getVersion());
                 checker.run(s -> {
                     String message;
                     if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
@@ -68,19 +76,19 @@ public class ELCommand extends EternalCommand {
                         message = "&eYou are running a development build! Expect bugs.";
                     }
                     if (getSender() != null) {
-                        msg(PluginData.PREFIX + message);
+                        msg(plugin.getPluginConfig().getPrefix() + message);
                     }
                 });
                 return;
             }
-            msg(PluginData.PREFIX + "&cUnknown command. Use /" + getLabelUsed() + " for help.");
+            msg(plugin.getPluginConfig().getPrefix() + "&cUnknown command. Use /" + getLabelUsed() + " for help.");
         }
     }
 
     @Override
     public List<String> tabComplete(String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("reload", "version", "renderdistance");
+            return Arrays.asList("reload", "version", "renderDistance", "reloadMappings");
         }
         return Collections.emptyList();
     }
