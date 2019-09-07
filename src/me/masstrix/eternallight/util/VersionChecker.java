@@ -52,7 +52,7 @@ public class VersionChecker {
     /**
      * Meta for a plugins version returned in {@link VersionCallback#done(VersionMeta)}.
      */
-    public class VersionMeta {
+    public static class VersionMeta {
         private String currentStr, latestStr;
         private byte[] current = null, latest = null;
         private PluginVersionState state;

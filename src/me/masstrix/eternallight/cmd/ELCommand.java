@@ -54,7 +54,7 @@ public class ELCommand extends EternalCommand {
             }
             else if (args[0].equalsIgnoreCase("version")) {
                 msg(PluginData.PREFIX + "&7Checking version...");
-                VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, PluginData.VERSION);
+                VersionChecker checker = new VersionChecker(PluginData.RESOURCE_ID, plugin.getVersion());
                 checker.run(s -> {
                     String message;
                     if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
