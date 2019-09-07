@@ -1,5 +1,5 @@
 #    -------------------
-#  E T E R N A L    L I H G T
+#  E T E R N A L    L I G H T
 #    -------------------
 # Eternal Light is a plugin based from the Not Enough Item's mod light level overlays.
 # Red meaning hostile mobs can spawn at any time; yellow only during night and green
@@ -15,9 +15,21 @@
 #   ALL - Red, yellow and green areas shown.
 #   LIGHTLEVEL - All areas show like ALL mode but smoothed.
 #                      ---
+version: 2
+
 general:
   update-notifications: true
 
 # What the radius of the projector is. Best kept small (0 - 7) to improve performance.
 # Range is capped at 12.
 radius: 5
+
+# Used as the default mode for when players first enabled it.
+default-mode: SPAWNABLE
+
+messages:
+  prefix: "&e&l[EternalLight] &f"
+  use-prefix: true
+  activate: "Enabled the light level projector. &7Use /ll mode to toggle between display modes."
+  deactivate: "Disabled light level projector."
+  change-mode: "Set display mode to &7%mode%"
