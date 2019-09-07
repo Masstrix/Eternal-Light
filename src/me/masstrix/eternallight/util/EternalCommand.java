@@ -30,7 +30,11 @@ public abstract class EternalCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public final List<String> onTabComplete(@Nonnull CommandSender sender, @Nonnull Command cm, @Nonnull String label, @Nonnull String[] args) {
-        return tabComplete(args);
+        List<String> tab = tabComplete(args);
+        if (tab != null) return tab;
+        tab = tabComplete(sender, args);
+        if (tab != null) return tab;
+        return Collections.emptyList();
     }
 
     @Override
@@ -60,6 +64,10 @@ public abstract class EternalCommand implements CommandExecutor, TabCompleter {
     public abstract void execute(String[] args);
 
     public List<String> tabComplete(String[] args) {
-        return Collections.emptyList();
+        return null;
+    }
+
+    public List<String> tabComplete(CommandSender sender, String[] args) {
+        return null;
     }
 }
