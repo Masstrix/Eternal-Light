@@ -27,14 +27,17 @@
 # EXPLANATIONS
 #   radius           - Sets the radius players can see light levels in. It's advised to keep this
 #                      lower as it adds exponentially more load on the server the larger it is.
+#   update-rate      - Sets how long to wait between each display render of the particles in ticks (20 ticks a second). 
+#                      Increasing this will reduce load on the server as people use it.
 #   default-mode     - Default mode used for when players first toggle on the display.
 #   messages.enabled - If false players will not see activate, deactivate and change-mode messages.
 # 
 update-notifications: true
 radius: 5
+update-rate: 20
 default-mode: SPAWNABLE
 messages:
-  enabledd: true
+  enabled: true
   use-prefix: true
   prefix: "&e&l[EternalLight] &f"
   activate: "&aEnabled&f the light level projector. &7Use /ll mode to toggle between display modes."

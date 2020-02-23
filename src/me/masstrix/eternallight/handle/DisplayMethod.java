@@ -22,11 +22,18 @@ public enum DisplayMethod {
      */
     LIGHTLEVEL;
 
+    private String lowercase, formatted;
+
+    DisplayMethod() {
+        lowercase = name().toLowerCase();
+        formatted = name().substring(0, 1) + name().substring(1).toLowerCase();
+    }
+
     private static List<String> options = new ArrayList<>();
 
     static {
         for (DisplayMethod m : values()) {
-            options.add(m.name().substring(0, 1) + m.name().substring(1).toLowerCase());
+            options.add(m.formatted);
         }
     }
 
@@ -48,5 +55,13 @@ public enum DisplayMethod {
 
     public DisplayMethod next() {
         return values[(this.ordinal() + 1) % values.length];
+    }
+
+    public String asLowerCase() {
+        return lowercase;
+    }
+
+    public String getName() {
+        return formatted;
     }
 }

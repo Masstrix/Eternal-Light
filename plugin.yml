@@ -1,9 +1,9 @@
 name: EternalLight
 main: me.masstrix.eternallight.EternalLight
 description: "Eternal Light makes it easy to see where mobs can spawn."
-version: 1.4
+version: 1.5
 author: Masstrix
-api-version: 1.13
+api-version: 1.14
 
 commands:
   eternallight:
@@ -15,4 +15,3 @@ commands:
     aliases:
       - ll
     description: "Light level options."
-    permission: "eternallight.use"

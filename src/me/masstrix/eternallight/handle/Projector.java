@@ -4,6 +4,7 @@ import me.masstrix.eternallight.EternalLight;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,17 +14,32 @@ public class Projector {
 
     protected EternalLight plugin;
     private Map<UUID, LightVisual> visualMap = new HashMap<>();
+    private BukkitTask projectorTask;
 
     public Projector(EternalLight plugin) {
         this.plugin = plugin;
-        new BukkitRunnable() {
+        start();
+    }
+
+    /**
+     * Starts the projector. THis loops over all players with a light visual enabled
+     * and calls for it to be updated. If called while already running the projector
+     * is stopped and started again.
+     */
+    public void start() {
+        if (projectorTask != null) {
+            projectorTask.cancel();
+            projectorTask = null;
+        }
+        int updateRate = plugin.getPluginConfig().getProjectorUpdateRate();
+        projectorTask = new BukkitRunnable() {
             @Override
             public void run() {
                 for (LightVisual visual : visualMap.values()) {
                     visual.update();
                 }
             }
-        }.runTaskTimer(plugin, 20, 5);
+        }.runTaskTimer(plugin, updateRate, 5);
     }
 
     /**

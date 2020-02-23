@@ -33,6 +33,9 @@ public class MinecraftVersion {
         VERSIONS.put(485, "1.14.2");
         VERSIONS.put(490, "1.14.3");
         VERSIONS.put(498, "1.14.4");
+        VERSIONS.put(573, "1.15");
+        VERSIONS.put(575, "1.15.1");
+        VERSIONS.put(578, "1.15.2");
 
         // Find and set the servers version.
         byte[] version = ReflectionUtil.getVersionUnsafe();

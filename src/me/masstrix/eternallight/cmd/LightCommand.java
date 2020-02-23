@@ -33,6 +33,12 @@ public class LightCommand extends EternalCommand {
         Projector projector = plugin.getProjector();
         EternalLightConfig config = plugin.getPluginConfig();
 
+        // Check if player has permission to use command
+        if (!player.hasPermission(Perm.USE)) {
+            msg(config.getMessage(EternalLightConfig.ConfigMessage.NO_PERMISSION));
+            return;
+        }
+
         if (!projector.contains(player.getUniqueId())) projector.add(player);
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("help") && player.hasPermission(Perm.MODE)

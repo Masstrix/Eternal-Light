@@ -14,7 +14,7 @@ public class EternalLightConfig {
     private static final int RAD_MAX = 20;
 
     private EternalLight plugin;
-    private int rad;
+    private int rad, updateRate;
     private DisplayMethod defMethod;
     private boolean updates = true;
     private boolean usePrefix;
@@ -34,6 +34,7 @@ public class EternalLightConfig {
         updates = config.getBoolean("update-notifications", true);
         usePrefix = config.getBoolean("messages.use-prefix", true);
         messagesEnabled = config.getBoolean("messages.enabled", true);
+        updateRate = config.getInt("update-rate", 20);
 
         // Get all the messages
         ConfigurationSection messageSection = config.getConfigurationSection("messages");
@@ -63,6 +64,10 @@ public class EternalLightConfig {
      */
     public boolean usePrefix() {
         return usePrefix;
+    }
+
+    public int getProjectorUpdateRate() {
+        return updateRate;
     }
 
     /**

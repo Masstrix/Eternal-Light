@@ -25,7 +25,7 @@ public class PlayerConnectionListener implements Listener {
                 && plugin.getPluginConfig().sendUpdateNotifications()) {
             VersionChecker.VersionMeta meta = plugin.getVersionMeta();
             if (meta == null) return;
-            if (meta.getState() == VersionChecker.PluginVersionState.BEHIND) {
+            if (meta.getState() == VersionChecker.VersionState.BEHIND) {
                 player.sendMessage(StringUtil.color(
                         plugin.getPluginConfig().getPrefix() + "&bA newer version is available. " +
                                 "Update now to get new features and bug patch's."));

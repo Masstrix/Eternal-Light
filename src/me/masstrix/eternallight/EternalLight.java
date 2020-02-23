@@ -26,6 +26,9 @@ public class EternalLight extends JavaPlugin {
     private EternalLightConfig config;
     private VersionChecker.VersionMeta versionMeta;
 
+    /**
+     * @return the native version for this plugin to run on.
+     */
     public static MinecraftVersion getNativeVersion() {
         return NATIVE;
     }
@@ -54,24 +57,35 @@ public class EternalLight extends JavaPlugin {
         registerCommands(new ELCommand(this), new LightCommand(this));
 
         // Check for updates.
-        VersionChecker checker = new VersionChecker(EternalLight.RESOURCE_ID, version);
-        checker.run(s -> {
-            if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
-                getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
-            }
-            else if (s.getState() == VersionChecker.PluginVersionState.DEV_BUILD) {
+        new VersionChecker(EternalLight.RESOURCE_ID, version).run(new VersionChecker.VersionCallback() {
+            @Override
+            public void done(VersionChecker.VersionMeta s) {
                 ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
+                if (s.getState() == VersionChecker.VersionState.UNKNOWN) {
+                    getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+                }
+                else if (s.getState() == VersionChecker.VersionState.DEV_BUILD) {
+                    sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
+                }
+                else if (s.getState() == VersionChecker.VersionState.BEHIND) {
+                    sender.sendMessage(StringUtil.color(""));
+                    sender.sendMessage(StringUtil.color("&e New update available for "  + getName()));
+                    sender.sendMessage(StringUtil.color(" Current version: &e" + version));
+                    sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
+                    sender.sendMessage(StringUtil.color(""));
+                }
+                versionMeta = s;
             }
-            else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                sender.sendMessage(StringUtil.color(""));
-                sender.sendMessage(StringUtil.color("&e New update available for "  + getName()));
-                sender.sendMessage(StringUtil.color(" Current version: &e" + version));
-                sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
-                sender.sendMessage(StringUtil.color(""));
+
+            @Override
+            public void onTimeout() {
+                getLogger().log(Level.WARNING, "Connection timed out. Could not check version.");
             }
-            this.versionMeta = s;
+
+            @Override
+            public void onError() {
+                getLogger().log(Level.WARNING, "Failed to read version data.");
+            }
         });
     }
 

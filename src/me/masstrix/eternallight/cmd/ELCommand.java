@@ -23,7 +23,7 @@ public class ELCommand extends EternalCommand {
         if (args.length == 0) {
             msg("");
             msg("   &e&lEternal Light &7" + plugin.getVersion());
-            if (plugin.getVersionMeta().getState() == VersionChecker.PluginVersionState.BEHIND) {
+            if (plugin.getVersionMeta().getState() == VersionChecker.VersionState.BEHIND) {
                 msg(" &bA newer version is available. " +
                         "Update now to get new features and bug patch's.");
                 msg("");
@@ -36,6 +36,7 @@ public class ELCommand extends EternalCommand {
         } else {
             if (args[0].equalsIgnoreCase("reload")) {
                 plugin.getPluginConfig().reload();
+                plugin.getProjector().start();
                 msg(plugin.getPluginConfig().getPrefix() + "&aReloaded config.");
                 return;
             }
@@ -62,23 +63,31 @@ public class ELCommand extends EternalCommand {
             }
             else if (args[0].equalsIgnoreCase("version")) {
                 msg(plugin.getPluginConfig().getPrefix() + "&7Checking version...");
-                VersionChecker checker = new VersionChecker(EternalLight.RESOURCE_ID, plugin.getVersion());
-                checker.run(s -> {
-                    String message;
-                    if (s.getState() == VersionChecker.PluginVersionState.UNKNOWN) {
-                        message = "&cThere was an error in checking for updates.";
+                VersionChecker.VersionMeta meta = plugin.getVersionMeta();
+                if (meta == null) {
+                    msg(plugin.getPluginConfig().getPrefix() + "&cUnable to check version.");
+                    return;
+                }
+                String msg = "&cUnexpected error.";
+                switch (meta.getState()) {
+                    case BEHIND: {
+                        msg = "&cYou are running an outdated version.";
+                        break;
                     }
-                    else if (s.getState() == VersionChecker.PluginVersionState.BEHIND) {
-                        message = "&bYou are running behind. Update to get bug patch's and new features.";
-                    } else if (s.getState() == VersionChecker.PluginVersionState.LATEST) {
-                        message = "&aAll up to date!";
-                    } else {
-                        message = "&eYou are running a development build! Expect bugs.";
+                    case UNKNOWN: {
+                        msg = "Latest version is unknown.";
+                        break;
                     }
-                    if (getSender() != null) {
-                        msg(plugin.getPluginConfig().getPrefix() + message);
+                    case LATEST: {
+                        msg = "&aUp to date! &7You are running the latest version.";
+                        break;
                     }
-                });
+                    case DEV_BUILD: {
+                        msg = "&6Dev Build! Expect bugs, this version is not officially released yet.";
+                        break;
+                    }
+                }
+                msg(plugin.getPluginConfig().getPrefix() + msg);
                 return;
             }
             msg(plugin.getPluginConfig().getPrefix() + "&cUnknown command. Use /" + getLabelUsed() + " for help.");
