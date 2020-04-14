@@ -23,7 +23,8 @@ public class ELCommand extends EternalCommand {
         if (args.length == 0) {
             msg("");
             msg("   &e&lEternal Light &7" + plugin.getVersion());
-            if (plugin.getVersionMeta().getState() == VersionChecker.VersionState.BEHIND) {
+            VersionChecker.VersionMeta vm = plugin.getVersionMeta();
+            if (vm != null && vm.getState() == VersionChecker.VersionState.BEHIND) {
                 msg(" &bA newer version is available. " +
                         "Update now to get new features and bug patch's.");
                 msg("");

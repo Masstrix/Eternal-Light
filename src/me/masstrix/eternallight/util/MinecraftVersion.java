@@ -58,9 +58,11 @@ public class MinecraftVersion {
     private String name;
     private int protocolVersion = -1;
     private boolean valid;
+    private byte[] asBytes;
 
     public MinecraftVersion(String name) {
         this.name = name;
+        this.asBytes = getBytes(name);
         for (Map.Entry<Integer, String> entry : VERSIONS.entrySet()) {
             if (entry.getValue().equalsIgnoreCase(name)) {
                 this.protocolVersion = entry.getKey();
@@ -100,5 +102,76 @@ public class MinecraftVersion {
 
     private boolean validate() {
         return VERSIONS.containsKey(protocolVersion);
+    }
+
+    /**
+     * Compare this version instance to another version.
+     *
+     * @param compare version to compare against.
+     * @return -1 if this version is behind <code>compare</code>.
+     *         0 if the two versions as the same.
+     *         1 if this version is ahead of <code>compare</code>.
+     */
+    public byte compareTo(MinecraftVersion compare) {
+        return this.compareTo(compare.name);
+    }
+
+    /**
+     * Compare this version instance to another version.
+     *
+     * @param compare version to compare against.
+     * @return -1 if this version is behind <code>compare</code>.
+     *         0 if the two versions as the same.
+     *         1 if this version is ahead of <code>compare</code>.
+     */
+    public byte compareTo(String compare) {
+        if (compare.equalsIgnoreCase(this.name)) return 0;
+        String[] compareData = compare.split("\\.");
+
+        int len = Math.min(compareData.length, this.asBytes.length);
+        for (int i = 0; i < len; i++) {
+            byte a = Byte.parseByte(compareData[i]);
+            byte b = this.asBytes[i];
+
+            if (b > a) return 1;
+            else if (b < a) return -1;
+        }
+        return 0;
+    }
+
+    /**
+     * Compares this version and returns if this version is older than
+     * the compared one.
+     *
+     * @param compare version to compare to.
+     * @return returns if this version is behind <code>compare</code>.
+     */
+    public boolean isBehindVersion(MinecraftVersion compare) {
+        return this.compareTo(compare) == -1;
+    }
+
+    /**
+     * Compares this version and returns if this version is newer than
+     * the compared one.
+     *
+     * @param compare version to compare to.
+     * @return returns if this version is ahead of <code>compare</code>.
+     */
+    public boolean isAheadOfVersion(MinecraftVersion compare) {
+        return this.compareTo(compare) == 1;
+    }
+
+    /**
+     * Converts a version into an array of bytes and returns it.
+     *
+     * @param version version in string format.
+     * @return an array of bytes parsed from <code>version</code>.
+     */
+    private static byte[] getBytes(String version) {
+        String[] s = version.split("\\.");
+        byte[] data = new byte[s.length];
+        for (int i = 0; i < s.length; i++)
+            data[i] = Byte.parseByte(s[i]);
+        return data;
     }
 }

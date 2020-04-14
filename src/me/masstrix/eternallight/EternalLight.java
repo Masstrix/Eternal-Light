@@ -5,6 +5,7 @@ import me.masstrix.eternallight.handle.Projector;
 import me.masstrix.eternallight.handle.SpawnValue;
 import me.masstrix.eternallight.listener.PlayerConnectionListener;
 import me.masstrix.eternallight.listener.PlayerMoveListener;
+import me.masstrix.eternallight.metric.Metrics;
 import me.masstrix.eternallight.util.*;
 import me.masstrix.eternallight.cmd.ELCommand;
 import org.bukkit.Bukkit;
@@ -35,7 +36,8 @@ public class EternalLight extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        if (isLegacy()) {
+        MinecraftVersion sv = MinecraftVersion.getServerVersion();
+        if (sv.isBehindVersion(NATIVE)) {
             getLogger().warning("Unsupported version! This version of EternalLight does not support versions below 1.13.");
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.isOp() || p.hasPermission(Perm.ADMIN)) {
@@ -87,6 +89,8 @@ public class EternalLight extends JavaPlugin {
                 getLogger().log(Level.WARNING, "Failed to read version data.");
             }
         });
+
+        new Metrics(this);
     }
 
     /**
@@ -101,6 +105,7 @@ public class EternalLight extends JavaPlugin {
      *
      * @return if the server version is older than 1.13.
      */
+    @Deprecated
     private boolean isLegacy() {
         byte[] ver = ReflectionUtil.getVersionUnsafe();
         return ver.length > 1 && ver[1] < 13;
