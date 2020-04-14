@@ -58,7 +58,19 @@ public class EternalLight extends JavaPlugin {
         registerListener(new PlayerMoveListener(this), new PlayerConnectionListener(this));
         registerCommands(new ELCommand(this), new LightCommand(this));
 
-        // Check for updates.
+        new Metrics(this);
+
+        checkVersion();
+    }
+
+    private void checkVersion() {
+        checkVersion(0);
+    }
+
+    /**
+     * Checks if here is a newer version available.
+     */
+    private void checkVersion(int attempts) {
         new VersionChecker(EternalLight.RESOURCE_ID, version).run(new VersionChecker.VersionCallback() {
             @Override
             public void done(VersionChecker.VersionMeta s) {
@@ -75,6 +87,8 @@ public class EternalLight extends JavaPlugin {
                     sender.sendMessage(StringUtil.color(" Current version: &e" + version));
                     sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
                     sender.sendMessage(StringUtil.color(""));
+                } else if (s.getState() == VersionChecker.VersionState.LATEST)  {
+                    getLogger().log(Level.INFO, "You are running the latest available version.");
                 }
                 versionMeta = s;
             }
@@ -85,12 +99,19 @@ public class EternalLight extends JavaPlugin {
             }
 
             @Override
-            public void onError() {
-                getLogger().log(Level.WARNING, "Failed to read version data.");
+            public void onError(String msg) {
+                getLogger().log(Level.WARNING, "Failed to read version data: " +  msg);
+                if (msg.equals("SSLException")) {
+                    getLogger().log(Level.INFO, "This error may be caused from the version of Java you re running.");
+                }
+                if (attempts < 3) {
+                    getLogger().log(Level.WARNING, "Re Attempting to check version...");
+                    checkVersion(attempts + 1);
+                } else {
+                    getLogger().log(Level.WARNING, "Failed to check version after 3 attempts.");
+                }
             }
         });
-
-        new Metrics(this);
     }
 
     /**

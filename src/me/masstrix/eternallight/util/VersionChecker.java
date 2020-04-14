@@ -6,6 +6,7 @@ import com.google.gson.JsonParseException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.SocketException;
@@ -77,12 +78,15 @@ public class VersionChecker {
                     callback.done(meta);
                 } catch (JsonParseException e) {
                     e.printStackTrace();
-                    callback.onError();
+                    callback.onError("Failed to parse json");
                 }
             } catch (SocketException e) {
                 callback.onTimeout();
+                callback.onError("Connection Timeout");
+            } catch (SSLException e) {
+                callback.onError("SSLException");
             } catch (Exception e) {
-                callback.onError();
+                callback.onError("Exception");
             }
         }, "VersionChecker").start();
         return this;
@@ -96,7 +100,7 @@ public class VersionChecker {
 
         public void onTimeout() {}
 
-        public void onError() {}
+        public void onError(String msg) {}
     }
 
     /**
