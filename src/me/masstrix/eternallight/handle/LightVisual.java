@@ -67,7 +67,7 @@ public class LightVisual {
      * Send an update to the player of the surrounding systems.
      */
     public void update() {
-        if (enabled) send();
+        if (enabled) render();
     }
 
     /**
@@ -93,7 +93,11 @@ public class LightVisual {
         return method;
     }
 
-    private void send() {
+    /**
+     * Scans al nearby blocks in the given radius and height values defined in
+     * the config and displays there light levels as particles.
+     */
+    private void render() {
         if (this.player == null) {
             projector.remove(PLAYER_UUID);
             return;
@@ -101,15 +105,17 @@ public class LightVisual {
         Location loc = player.getLocation().clone();
         World world = loc.getWorld();
         int px = loc.getBlockX(), py = loc.getBlockY(), pz = loc.getBlockZ();
-        int rad = config.getRadius();
+        int radA = config.getScannerRadius();
+        int radH = config.getScannerRadius();
 
         RGBParticle particle = new RGBParticle(0, 0, 0);
 
-        for (int z = -rad; z <= rad; z++) {
-            for (int x = -rad; x <= rad; x++) {
-                for (int y = -rad; y <= rad; y++) {
-                    if(Math.sqrt((x * x) + (y * y) + (z * z)) > rad) continue;
-                    //if (x * x + y * y + z * z < rad * rad) continue;
+        boolean spherical = config.isScannerSpherical();
+
+        for (int z = -radA; z <= radA; z++) {
+            for (int x = -radA; x <= radA; x++) {
+                for (int y = -radH; y <= radH; y++) {
+                    if (spherical && Math.sqrt((x * x) + (y * y) + (z * z)) > radA) continue;
                     assert world != null;
                     Block block = world.getBlockAt(px + x, py + y, pz + z);
                     SpawnValue spawnValue = SpawnValue.get(block.getType());
@@ -122,6 +128,13 @@ public class LightVisual {
                         if (isStairInSpawnRotation(block)) spawnValue = SpawnValue.ALWAYS;
                         else continue;
                     }
+
+                    // Check slab position
+                    if (this.method != DisplayMethod.LIGHTLEVEL && blockData instanceof Slab) {
+                        Slab slab = (Slab) blockData;
+                        if (slab.getType() == Slab.Type.BOTTOM) continue;
+                    }
+
                     if (spawnValue != SpawnValue.ALWAYS) continue;
 
                     // Validate if there is a 2 block gap above for mobs to spawn.
@@ -140,24 +153,34 @@ public class LightVisual {
 
                     Block onTop = world.getBlockAt(px + x, (py + y) + 1, pz + z);
 
-                    if (this.method == DisplayMethod.SPAWNABLE) {
-                        LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
-                        if (spawnCase == LightSpawnCase.NEVER) continue;
-                        particle.setColor(spawnCase.color);
-                    } else if (this.method == DisplayMethod.ALL) {
-                        LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
-                        particle.setColor(spawnCase.color);
-                    } else if (this.method == DisplayMethod.LIGHTLEVEL) {
-                        float p = (float) onTop.getLightFromBlocks() / 14F;
-                        Color c = new Color(255, 0, 6);
+                    // Render the particles depending on the selected method.
+                    switch (this.method) {
+                        case ALL: {
+                            LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
+                            particle.setColor(spawnCase.color);
+                            break;
+                        }
 
-                        // Get saturation and brightness.
-                        float[] hsbVals = new float[3];
-                        Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsbVals);
+                        case SPAWNABLE: {
+                            LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
+                            if (spawnCase == LightSpawnCase.NEVER) continue;
+                            particle.setColor(spawnCase.color);
+                            break;
+                        }
 
-                        // Shift the hue around by 25%
-                        c = new Color(Color.HSBtoRGB((0.25f * p), hsbVals[1], hsbVals[2]));
-                        particle.setColor(c);
+                        case LIGHTLEVEL: {
+                            float p = (float) onTop.getLightFromBlocks() / 14F;
+                            Color c = new Color(255, 0, 6);
+
+                            // Get saturation and brightness.
+                            float[] hsbVals = new float[3];
+                            Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), hsbVals);
+
+                            // Shift the hue around by 25%
+                            c = new Color(Color.HSBtoRGB((0.25f * p), hsbVals[1], hsbVals[2]));
+                            particle.setColor(c);
+                            break;
+                        }
                     }
                     particle.send(player, (px + x) + 0.5, (py + y) + getBlockHeight(block) + 0.2, (pz + z) + 0.5);
                 }

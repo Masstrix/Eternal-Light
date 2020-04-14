@@ -35,6 +35,15 @@ public enum SpawnValue {
 
     private static Map<Material, SpawnValue> mapping = new HashMap<>();
 
+    public static boolean resetMappings(EternalLight plugin) {
+        plugin.getLogger().info("Resetting material mappings...");
+
+        // Override mappings file with default
+        plugin.saveResource("mapping.txt", true);
+
+        return loadMappings(plugin);
+    }
+
     /**
      * Reads the mapping.txt file in the plugins folder and applies them to each material in the game.
      * This saves on computation time when rendering light levels.

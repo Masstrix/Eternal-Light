@@ -31,6 +31,7 @@ public class ELCommand extends EternalCommand {
             }
             msg("&e/" + getLabelUsed() + " reload &7-&f Reloads the plugins config file.");
             msg("&e/" + getLabelUsed() + " reloadMappings &7-&f Reloads and applies the mappings.");
+            msg("&e/" + getLabelUsed() + " resetMappings &7-&f Resets the mappings to default.");
             msg("&e/" + getLabelUsed() + " version &7-&f Checks for any updates.");
             msg("&e/" + getLabelUsed() + " renderdistance <distance> &7-&f Changes the render distance.");
             msg("");
@@ -48,9 +49,9 @@ public class ELCommand extends EternalCommand {
                 }
                 String str = args[1];
                 if (str.matches("\\d.*")) {
-                    plugin.getPluginConfig().setRadius(Integer.parseInt(str));
+                    plugin.getPluginConfig().setScannerRadius(Integer.parseInt(str));
                     plugin.getPluginConfig().save();
-                    msg(plugin.getPluginConfig().getPrefix() + "set render distance to " + plugin.getPluginConfig().getRadius());
+                    msg(plugin.getPluginConfig().getPrefix() + "set render distance to " + plugin.getPluginConfig().getScannerRadius());
                 }
                 return;
             }
@@ -60,6 +61,14 @@ public class ELCommand extends EternalCommand {
                     msg(plugin.getPluginConfig().getPrefix() + "&aReloaded mappings.");
                 else msg(plugin.getPluginConfig().getPrefix() + "&cThere was an error while reloading the mappings. " +
                         "Please make sure your mappings are valid.");
+                return;
+            }
+            else if (args[0].equalsIgnoreCase("resetMappings")) {
+                msg(plugin.getPluginConfig().getPrefix() + "&7Resetting material mappings...");
+                boolean success = SpawnValue.resetMappings(plugin);
+                if (success)
+                    msg(plugin.getPluginConfig().getPrefix() + "&aReset mappings to default.");
+                else msg(plugin.getPluginConfig().getPrefix() + "&cThere was an error while resetting the mappings.");
                 return;
             }
             else if (args[0].equalsIgnoreCase("version")) {
@@ -98,7 +107,7 @@ public class ELCommand extends EternalCommand {
     @Override
     public List<String> tabComplete(String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("reload", "version", "renderDistance", "reloadMappings");
+            return Arrays.asList("reload", "version", "renderDistance", "reloadMappings", "resetMappings");
         }
         return Collections.emptyList();
     }

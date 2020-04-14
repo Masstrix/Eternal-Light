@@ -33,7 +33,10 @@
 #   messages.enabled - If false players will not see activate, deactivate and change-mode messages.
 # 
 update-notifications: true
-radius: 5
+scanner:
+  spherical: true
+  radius: 4
+  height: 3
 update-rate: 20
 default-mode: SPAWNABLE
 messages:

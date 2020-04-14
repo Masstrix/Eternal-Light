@@ -11,14 +11,16 @@ import java.util.Map;
 
 public class EternalLightConfig {
 
+    // Hardcoded max, stops people using way to high of values.
     private static final int RAD_MAX = 20;
 
     private EternalLight plugin;
-    private int rad, updateRate;
+    private int scanRad, scanHeight, updateRate;
     private DisplayMethod defMethod;
     private boolean updates = true;
     private boolean usePrefix;
     private boolean messagesEnabled;
+    private boolean spherical;
 
     private Map<ConfigMessage, String> messages = new HashMap<>();
 
@@ -28,8 +30,11 @@ public class EternalLightConfig {
         plugin.saveConfig();
         FileConfiguration config = plugin.getConfig();
 
-        rad = config.getInt("radius", 5);
-        if (rad > RAD_MAX) rad = RAD_MAX;
+        spherical = config.getBoolean("scanner.spherical", true);
+        scanRad = config.getInt("scanner.radius", 5);
+        scanHeight = config.getInt("scanner.height", 4);
+        if (scanRad > RAD_MAX) scanRad = RAD_MAX;
+        if (scanHeight > RAD_MAX) scanRad = RAD_MAX;
         defMethod = DisplayMethod.find(config.getString("default-mode", DisplayMethod.SPAWNABLE.name()));
         updates = config.getBoolean("update-notifications", true);
         usePrefix = config.getBoolean("messages.use-prefix", true);
@@ -75,16 +80,40 @@ public class EternalLightConfig {
      *
      * @param rad new radius of projector.
      */
-    public void setRadius(int rad) {
-        this.rad = rad > RAD_MAX ? RAD_MAX : Math.max(rad, 1);
-        plugin.getConfig().set("radius", this.rad);
+    public void setScannerRadius(int rad) {
+        this.scanRad = rad > RAD_MAX ? RAD_MAX : Math.max(rad, 1);
+        plugin.getConfig().set("scanner..radius", this.scanRad);
     }
 
     /**
      * @return the display radius to show light levels.
      */
-    public int getRadius() {
-        return rad;
+    public int getScannerRadius() {
+        return scanRad;
+    }
+
+    /**
+     * Sets the radius of the projector.
+     *
+     * @param rad new radius of projector.
+     */
+    public void setScannerHeight(int rad) {
+        this.scanHeight = rad > RAD_MAX ? RAD_MAX : Math.max(rad, 1);
+        plugin.getConfig().set("scanner.height", this.scanHeight);
+    }
+
+    /**
+     * @return the display radius to show light levels.
+     */
+    public int getScannerHeight() {
+        return scanHeight;
+    }
+
+    /**
+     * @return if the scanner should be spherical.
+     */
+    public boolean isScannerSpherical() {
+        return spherical;
     }
 
     /**
