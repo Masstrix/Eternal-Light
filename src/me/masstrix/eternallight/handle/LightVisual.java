@@ -213,20 +213,4 @@ public class LightVisual {
         }
         return false;
     }
-
-    private enum LightSpawnCase {
-        NIGHT_SPAWN(Color.YELLOW), NEVER(Color.GREEN), ALWAYS(Color.RED);
-
-        Color color;
-
-        LightSpawnCase(Color color) {
-            this.color = color;
-        }
-
-        public static LightSpawnCase getCase(Block block) {
-            if (block.getLightFromBlocks() > 7) return NEVER;
-            if (block.getLightFromSky() > 7) return NIGHT_SPAWN;
-            else return ALWAYS;
-        }
-    }
 }
