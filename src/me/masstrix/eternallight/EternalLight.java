@@ -8,6 +8,11 @@ import me.masstrix.eternallight.listener.PlayerMoveListener;
 import me.masstrix.eternallight.metric.Metrics;
 import me.masstrix.eternallight.util.*;
 import me.masstrix.eternallight.cmd.ELCommand;
+import me.masstrix.eternallight.version.MinecraftRelease;
+import me.masstrix.eternallight.version.MinecraftVersion;
+import me.masstrix.eternallight.version.checker.CheckerApi;
+import me.masstrix.eternallight.version.checker.VersionCheckInfo;
+import me.masstrix.eternallight.version.checker.VersionChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -25,7 +30,7 @@ public class EternalLight extends JavaPlugin {
     private String version;
     private Projector projector;
     private EternalLightConfig config;
-    private VersionChecker.VersionMeta versionMeta;
+    private VersionCheckInfo versionInfo;
 
     /**
      * @return the native version for this plugin to run on.
@@ -36,8 +41,8 @@ public class EternalLight extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        MinecraftVersion sv = MinecraftVersion.getServerVersion();
-        if (sv.isBehindVersion(NATIVE)) {
+        MinecraftVersion sv = MinecraftRelease.getServerVersion();
+        if (sv.isBehind(NATIVE)) {
             getLogger().warning("Unsupported version! This version of EternalLight does not support versions below 1.13.");
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.isOp() || p.hasPermission(Perm.ADMIN)) {
@@ -64,54 +69,72 @@ public class EternalLight extends JavaPlugin {
     }
 
     private void checkVersion() {
-        checkVersion(0);
+        new VersionChecker(RESOURCE_ID, version)
+                .useApi(CheckerApi.SPIGOT_LEGACY)
+                .run(info -> {
+            if (info.isUnknown()) {
+                getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+            }
+            else if (info.isDev()) {
+                getLogger().log(Level.WARNING, "You are running a development build.");
+            }
+            else if (info.isLatest()) {
+                getLogger().log(Level.INFO, "Plugin is up to date.");
+            }
+            else if (info.isBehind()) {
+                getLogger().log(Level.INFO, "There is a new version available. ");
+            }
+            versionInfo = info;
+        });
     }
 
     /**
      * Checks if here is a newer version available.
      */
     private void checkVersion(int attempts) {
-        new VersionChecker(EternalLight.RESOURCE_ID, version).run(new VersionChecker.VersionCallback() {
-            @Override
-            public void done(VersionChecker.VersionMeta s) {
-                ConsoleCommandSender sender = Bukkit.getConsoleSender();
-                if (s.getState() == VersionChecker.VersionState.UNKNOWN) {
-                    getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
-                }
-                else if (s.getState() == VersionChecker.VersionState.DEV_BUILD) {
-                    sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
-                }
-                else if (s.getState() == VersionChecker.VersionState.BEHIND) {
-                    sender.sendMessage(StringUtil.color(""));
-                    sender.sendMessage(StringUtil.color("&e New update available for "  + getName()));
-                    sender.sendMessage(StringUtil.color(" Current version: &e" + version));
-                    sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
-                    sender.sendMessage(StringUtil.color(""));
-                } else if (s.getState() == VersionChecker.VersionState.LATEST)  {
-                    getLogger().log(Level.INFO, "You are running the latest available version.");
-                }
-                versionMeta = s;
-            }
-
-            @Override
-            public void onTimeout() {
-                getLogger().log(Level.WARNING, "Connection timed out. Could not check version.");
-            }
-
-            @Override
-            public void onError(String msg) {
-                getLogger().log(Level.WARNING, "Failed to read version data: " +  msg);
-                if (msg.equals("SSLException")) {
-                    getLogger().log(Level.INFO, "This error may be caused from the version of Java you re running.");
-                }
-                if (attempts < 3) {
-                    getLogger().log(Level.WARNING, "Re Attempting to check version...");
-                    checkVersion(attempts + 1);
-                } else {
-                    getLogger().log(Level.WARNING, "Failed to check version after 3 attempts.");
-                }
-            }
-        });
+//        new VersionChecker(EternalLight.RESOURCE_ID, version)
+//                .useApi(VersionChecker.ApiUsage.SPIGOT_LEGACY)
+//                .run(new VersionChecker.VersionCallback() {
+//            @Override
+//            public void done(VersionChecker.VersionMeta s) {
+//                ConsoleCommandSender sender = Bukkit.getConsoleSender();
+//                if (s.getState() == VersionChecker.VersionState.UNKNOWN) {
+//                    getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
+//                }
+//                else if (s.getState() == VersionChecker.VersionState.DEV_BUILD) {
+//                    sender.sendMessage(StringUtil.color("[EternalLight] \u00A7cYou are using a development build! Expect bugs."));
+//                }
+//                else if (s.getState() == VersionChecker.VersionState.BEHIND) {
+//                    sender.sendMessage(StringUtil.color(""));
+//                    sender.sendMessage(StringUtil.color("&e New update available for "  + getName()));
+//                    sender.sendMessage(StringUtil.color(" Current version: &e" + version));
+//                    sender.sendMessage(StringUtil.color(" Latest version: &e" + s.getLatestVersion()));
+//                    sender.sendMessage(StringUtil.color(""));
+//                } else if (s.getState() == VersionChecker.VersionState.LATEST)  {
+//                    getLogger().log(Level.INFO, "You are running the latest available version.");
+//                }
+//                versionMeta = s;
+//            }
+//
+//            @Override
+//            public void onTimeout() {
+//                getLogger().log(Level.WARNING, "Connection timed out. Could not check version.");
+//            }
+//
+//            @Override
+//            public void onError(String msg) {
+//                getLogger().log(Level.WARNING, "Failed to read version data: " +  msg);
+//                if (msg.equals("SSLException")) {
+//                    getLogger().log(Level.INFO, "This error may be caused from the version of Java you re running.");
+//                }
+//                if (attempts < 3) {
+//                    getLogger().log(Level.WARNING, "Re Attempting to check version...");
+//                    checkVersion(attempts + 1);
+//                } else {
+//                    getLogger().log(Level.WARNING, "Failed to check version after 3 attempts.");
+//                }
+//            }
+//        });
     }
 
     /**
@@ -149,8 +172,8 @@ public class EternalLight extends JavaPlugin {
     /**
      * @return the plugins version.
      */
-    public VersionChecker.VersionMeta getVersionMeta() {
-        return versionMeta;
+    public VersionCheckInfo getUpdateInfo() {
+        return versionInfo;
     }
 
     private void registerCommands(EternalCommand... commands) {

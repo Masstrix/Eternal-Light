@@ -3,7 +3,7 @@ package me.masstrix.eternallight.listener;
 import me.masstrix.eternallight.EternalLight;
 import me.masstrix.eternallight.util.Perm;
 import me.masstrix.eternallight.util.StringUtil;
-import me.masstrix.eternallight.util.VersionChecker;
+import me.masstrix.eternallight.version.checker.VersionCheckInfo;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,9 +23,8 @@ public class PlayerConnectionListener implements Listener {
         Player player = event.getPlayer();
         if (player.isOp() || player.hasPermission(Perm.ADMIN)
                 && plugin.getPluginConfig().sendUpdateNotifications()) {
-            VersionChecker.VersionMeta meta = plugin.getVersionMeta();
-            if (meta == null) return;
-            if (meta.getState() == VersionChecker.VersionState.BEHIND) {
+            VersionCheckInfo info = plugin.getUpdateInfo();
+            if (info != null && info.isBehind()) {
                 player.sendMessage(StringUtil.color(
                         plugin.getPluginConfig().getPrefix() + "&bA newer version is available. " +
                                 "Update now to get new features and bug patch's."));

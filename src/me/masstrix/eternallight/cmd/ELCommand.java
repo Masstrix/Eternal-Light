@@ -3,7 +3,7 @@ package me.masstrix.eternallight.cmd;
 import me.masstrix.eternallight.EternalLight;
 import me.masstrix.eternallight.handle.SpawnValue;
 import me.masstrix.eternallight.util.EternalCommand;
-import me.masstrix.eternallight.util.VersionChecker;
+import me.masstrix.eternallight.version.checker.VersionCheckInfo;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,10 +23,10 @@ public class ELCommand extends EternalCommand {
         if (args.length == 0) {
             msg("");
             msg("   &e&lEternal Light &7" + plugin.getVersion());
-            VersionChecker.VersionMeta vm = plugin.getVersionMeta();
-            if (vm != null && vm.getState() == VersionChecker.VersionState.BEHIND) {
+            VersionCheckInfo vm = plugin.getUpdateInfo();
+            if (vm != null && vm.isBehind()) {
                 msg(" &bA newer version is available. " +
-                        "Update now to get new features and bug patch's.");
+                        "It's recommended to update if possible.");
                 msg("");
             }
             msg("&e/" + getLabelUsed() + " reload &7-&f Reloads the plugins config file.");
@@ -73,30 +73,26 @@ public class ELCommand extends EternalCommand {
             }
             else if (args[0].equalsIgnoreCase("version")) {
                 msg(plugin.getPluginConfig().getPrefix() + "&7Checking version...");
-                VersionChecker.VersionMeta meta = plugin.getVersionMeta();
-                if (meta == null) {
+                VersionCheckInfo info = plugin.getUpdateInfo();
+                if (info == null) {
                     msg(plugin.getPluginConfig().getPrefix() + "&cUnable to check version.");
                     return;
                 }
+
                 String msg = "&cUnexpected error.";
-                switch (meta.getState()) {
-                    case BEHIND: {
-                        msg = "&cYou are running an outdated version.";
-                        break;
-                    }
-                    case UNKNOWN: {
-                        msg = "Latest version is unknown.";
-                        break;
-                    }
-                    case LATEST: {
-                        msg = "&aUp to date! &7You are running the latest version.";
-                        break;
-                    }
-                    case DEV_BUILD: {
-                        msg = "&6Dev Build! Expect bugs, this version is not officially released yet.";
-                        break;
-                    }
+                if (info.isUnknown()) {
+                    msg = "Unable to check version.";
                 }
+                else if (info.isDev()) {
+                    msg = "&6Dev Build! Expect bugs, this version is not officially released yet.";
+                }
+                else if (info.isLatest()) {
+                    msg = "&aUp to date! &7You are running the latest version.";
+                }
+                else if (info.isBehind()) {
+                    msg = "&cYou are running an outdated version.";
+                }
+
                 msg(plugin.getPluginConfig().getPrefix() + msg);
                 return;
             }
