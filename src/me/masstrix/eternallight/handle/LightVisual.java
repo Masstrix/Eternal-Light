@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.*;
 import org.bukkit.entity.Player;
 
@@ -121,6 +122,8 @@ public class LightVisual {
                     SpawnValue spawnValue = SpawnValue.get(block.getType());
                     BlockData blockData = block.getBlockData();
 
+                    // Check if block is solid or closed (for fence gates, doors etc.)
+                    if (blockData instanceof Openable && !((Openable) blockData).isOpen()) continue;
                     if (block.isPassable()) continue;
 
                     // Update for stairs

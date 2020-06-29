@@ -1,7 +1,7 @@
 name: EternalLight
 main: me.masstrix.eternallight.EternalLight
 description: "Eternal Light makes it easy to see where mobs can spawn."
-version: 1.7
+version: 1.7.1
 author: Masstrix
 api-version: 1.14
 
