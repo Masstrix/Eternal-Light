@@ -31,6 +31,7 @@ public class EternalLight extends JavaPlugin {
     private Projector projector;
     private EternalLightConfig config;
     private VersionCheckInfo versionInfo;
+    private VersionChecker checker;
 
     /**
      * @return the native version for this plugin to run on.
@@ -65,13 +66,23 @@ public class EternalLight extends JavaPlugin {
 
         new Metrics(this);
 
+        checker = new VersionChecker(RESOURCE_ID, version);
+        checker.useApi(CheckerApi.SPIGOT_LEGACY);
         checkVersion();
     }
 
+    /**
+     * @return the version checker for this plugin.
+     */
+    public VersionChecker getVersionChecker() {
+        return this.checker;
+    }
+
+    /**
+     * Checks the plugins version.
+     */
     private void checkVersion() {
-        new VersionChecker(RESOURCE_ID, version)
-                .useApi(CheckerApi.SPIGOT_LEGACY)
-                .run(info -> {
+        checker.run(info -> {
             if (info.isUnknown()) {
                 getLogger().log(Level.WARNING, "Failed to check plugin version. Are you running offline?");
             }

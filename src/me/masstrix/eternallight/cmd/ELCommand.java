@@ -73,27 +73,22 @@ public class ELCommand extends EternalCommand {
             }
             else if (args[0].equalsIgnoreCase("version")) {
                 msg(plugin.getPluginConfig().getPrefix() + "&7Checking version...");
-                VersionCheckInfo info = plugin.getUpdateInfo();
-                if (info == null) {
-                    msg(plugin.getPluginConfig().getPrefix() + "&cUnable to check version.");
-                    return;
-                }
-
-                String msg = "&cUnexpected error.";
-                if (info.isUnknown()) {
-                    msg = "Unable to check version.";
-                }
-                else if (info.isDev()) {
-                    msg = "&6Dev Build! Expect bugs, this version is not officially released yet.";
-                }
-                else if (info.isLatest()) {
-                    msg = "&aUp to date! &7You are running the latest version.";
-                }
-                else if (info.isBehind()) {
-                    msg = "&cYou are running an outdated version.";
-                }
-
-                msg(plugin.getPluginConfig().getPrefix() + msg);
+                plugin.getVersionChecker().run(info -> {
+                    String msg = "&cFailed to check version.";
+                    if (info.isUnknown()) {
+                        msg = "Unable to check version.";
+                    }
+                    else if (info.isDev()) {
+                        msg = "&6Dev Build! Expect bugs, this version is not officially released yet.";
+                    }
+                    else if (info.isLatest()) {
+                        msg = "&aUp to date! &7You are running the latest version.";
+                    }
+                    else if (info.isBehind()) {
+                        msg = "&cYou are running an outdated version.";
+                    }
+                    msg(plugin.getPluginConfig().getPrefix() + msg);
+                });
                 return;
             }
             msg(plugin.getPluginConfig().getPrefix() + "&cUnknown command. Use /" + getLabelUsed() + " for help.");
