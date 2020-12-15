@@ -17,6 +17,12 @@
     </a>
 </p>
 
+# Quick Links
+* [Discord Support](https://discord.gg/Uk3M9Y6)
+* [Spigot Page](https://www.spigotmc.org/resources/50961/)
+* [Wiki](https://github.com/Masstrix/Eternal-Light/wiki)
+* [Report an Issue](https://github.com/Masstrix/Eternal-Light/issues/new)
+
 # Commands
 * `/eternallight reload` Reloads the plugins config file.  
 * `/eternallight version` Checks the plugins version.  
