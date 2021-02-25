@@ -27,8 +27,8 @@
 * `/eternallight reload` Reloads the plugins config file.  
 * `/eternallight version` Checks the plugins version.  
 * `/eternallight renderdistance <distance>` Changes how far out it renders light points. This will cause expetentually more load the larger it is.  
-* `/lightlevel or /ll` Toggles the light level display.  
-* `/lightlevel mode [mode]` Toggles between the active modes for the light level display.
+* `/lightlevels or /ll` Toggles the light level display.  
+* `/lightlevels mode [mode]` Toggles between the active modes for the light level display.
 
 # Display Methods
 * `All` Renders yellow where hostile mobs can spawn at night, red where they can spawn at any time, and green where they cannot spawn.
