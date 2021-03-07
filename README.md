@@ -23,6 +23,20 @@
 * [Wiki](https://github.com/Masstrix/Eternal-Light/wiki)
 * [Report an Issue](https://github.com/Masstrix/Eternal-Light/issues/new)
 
+# Permissions
+To set the permissions, open the file `permissions.yml` in the spigot 
+directory (the one that contains spigot.yml and bukkit.yml) and paste the following:
+```
+eternallight.admin: 
+  default: true
+eternallight.use:
+  default: true
+eternallight.mode: 
+  default: true
+```
+You can see the available options in the documentation to [the permissions.yml file](https://bukkit.gamepedia.com/Permissions.yml). 
+If you are using a permission plugin, refer to its documentation instead.
+
 # Commands
 * `/eternallight reload` Reloads the plugins config file.  
 * `/eternallight version` Checks the plugins version.  
