@@ -15,6 +15,9 @@
     <a>
         <img src="https://img.shields.io/bstats/servers/6575?style=for-the-badge">
     </a>
+    <a>
+        <img src="https://img.shields.io/bstats/players/6575?style=for-the-badge">
+    </a>
 </p>
 
 # Quick Links
