@@ -16,7 +16,7 @@ public enum LightSpawnCase {
 
     public static LightSpawnCase getCase(Block block) {
         World.Environment environment = block.getWorld().getEnvironment();
-        int base = environment == World.Environment.NETHER ? 11 : 7;
+        int base = environment == World.Environment.NETHER ? 11 : 0;
 
         if (block.getLightFromBlocks() > base) return NEVER;
         if (block.getLightFromSky() > base) return NIGHT_SPAWN;
