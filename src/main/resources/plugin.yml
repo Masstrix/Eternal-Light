@@ -3,7 +3,7 @@ main: me.masstrix.eternallight.EternalLight
 description: "${project.description}"
 version: ${project.version}
 author: Masstrix
-api-version: ${target.version}
+api-version: 1.14
 
 commands:
   eternallight:
@@ -15,3 +15,16 @@ commands:
     aliases:
       - ll
     description: "Light level options."
+    
+permissions: 
+  eternalight.use:
+    default: op
+  eternallight.admin:
+    default: op
+  eternallight.mode:
+    default: op
+  eternallight.target:
+    default: op
+  eternallight.*:
+    default: op
+    
