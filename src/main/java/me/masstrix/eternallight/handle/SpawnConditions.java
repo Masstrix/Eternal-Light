@@ -62,17 +62,12 @@ public class SpawnConditions {
                 set.add(type);
             }
 
-            System.out.println(obj);
-
             // Creates a special case for the entity
             if (obj.toString().startsWith("{")) {
                 JsonObject json = (JsonObject) JsonParser.parseString(obj.toString());
                 // Load object name
                 name = json.entrySet().stream().findFirst().get().getKey();
                 JsonObject s = json.getAsJsonObject(name);
-
-                System.out.println(json);
-                System.out.println(s);
 
                 // Load settings
                 int overWorld = s.has("overworld") ? s.get("overworld").getAsInt() : -1;
@@ -98,8 +93,6 @@ public class SpawnConditions {
                 if (end != -1)
                     special.end = end;
             }
-
-            System.out.println("Loading in " + type.name());
         }
     }
 
@@ -140,11 +133,8 @@ public class SpawnConditions {
 
             // Load
             loadMobsFromList(section.getList("overworld"), MOBS_OVER_WORLD);
-            System.out.println(Arrays.toString(MOBS_OVER_WORLD.toArray()));
             loadMobsFromList(section.getList("nether"), MOBS_NETHER);
-            System.out.println(Arrays.toString(MOBS_NETHER.toArray()));
             loadMobsFromList(section.getList("end"), MOBS_END);
-            System.out.println(Arrays.toString(MOBS_END.toArray()));
         }
     }
 
