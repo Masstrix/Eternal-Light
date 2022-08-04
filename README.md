@@ -39,6 +39,11 @@ eternallight.mode:
 eternallight.target: 
   default: true
 ```
+* `eternallight.admin` - Gives permission to use /eternallight.
+* `eternallight.use` - Gives permission to toggle and use the overlay.
+* `eternallight.mode` - Allows players to change the mode with /ll mode.
+* `eternallight.target` - Allows players to change the target with /ll target.
+
 You can see the available options in the documentation to [the permissions.yml file](https://bukkit.gamepedia.com/Permissions.yml). 
 If you are using a permission plugin, refer to its documentation instead.
 
