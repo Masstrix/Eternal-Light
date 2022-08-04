@@ -97,7 +97,7 @@ public class SpawnConditions {
         isLegacy = plugin.isLegacyServer();
 
         // Load light level settings
-        if (config.contains("lightlevel")) {
+        if (config.contains("lightlevels")) {
             int overworld = config.getInt("lightlevel.overworld", 0);
             int nether = config.getInt("lightlevel.nether", 11);
             int end = config.getInt("lightlevel.end", 11);
