@@ -5,11 +5,15 @@ import me.masstrix.eternallight.handle.DisplayMethod;
 import me.masstrix.eternallight.handle.LightVisual;
 import me.masstrix.eternallight.handle.Projector;
 import me.masstrix.eternallight.EternalLight;
+import me.masstrix.eternallight.handle.SpawnConditions;
+import me.masstrix.eternallight.util.EnumUtil;
 import me.masstrix.eternallight.util.EternalCommand;
 import me.masstrix.eternallight.util.Perm;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +50,8 @@ public class LightCommand extends EternalCommand {
                 msg("");
                 msg("&e/lightlevels &7-&f Toggle light indicators.");
                 msg("&e/lightlevels mode [mode] &7-&f Change display mode.");
+                msg("&e/lightlevels target [entity] &7-&f Set a target entity type to display light levels for.");
+                msg("&e/lightlevels targetlist &7-&f List all valid entity targets.");
                 msg("");
             }
             else if (args[0].equalsIgnoreCase("mode")) {
@@ -68,6 +74,32 @@ public class LightCommand extends EternalCommand {
                     msg(config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.CHANGE_MODE)
                             .replaceAll("%mode%", visual.getMethod().toString()));
             }
+            else if (args[0].equalsIgnoreCase("target")) {
+                if (!player.hasPermission(Perm.TARGET)) {
+                    msg(player, config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.NO_PERMISSION));
+                    return;
+                }
+
+                if (args.length == 1 || args[1].equalsIgnoreCase("All")) {
+                    LightVisual visual = plugin.getProjector().getVisual(player);
+                    visual.setTargetEntityType(null);
+                    msg(player, config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.SET_TARGET)
+                            .replace("%target%", "All"));
+                    return;
+                }
+
+                String in = args[1];
+                EntityType type = EnumUtil.getValue(EntityType.class, in.toUpperCase());
+                if (type == null) {
+                    msg(player, config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.INVALID_TARGET));
+                    return;
+                }
+
+                LightVisual visual = plugin.getProjector().getVisual(player);
+                visual.setTargetEntityType(type);
+                msg(player, config.getPrefix() + config.getMessage(EternalLightConfig.ConfigMessage.SET_TARGET)
+                        .replace("%target%", type.name()));
+            }
             return;
         }
         if (config.isMessagesEnabled()) {
@@ -83,10 +115,15 @@ public class LightCommand extends EternalCommand {
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (!sender.hasPermission(Perm.MODE)) return Collections.emptyList();
         if (args.length == 1) {
-            return Arrays.asList("mode", "help");
+            return Arrays.asList("mode", "help", "target");
         }
         else if (args.length == 2 && args[0].equalsIgnoreCase("mode")) {
             return DisplayMethod.getOptions();
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("target")) {
+            List<String> types = new ArrayList<>();
+            types.add("All");
+            types.addAll(SpawnConditions.tabEntityTypes());
+            return types;
         }
         return Collections.emptyList();
     }

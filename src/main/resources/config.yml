@@ -48,6 +48,8 @@ messages:
   change-mode: "Set display mode to &7%mode%"
   no-permission: "&cYou do not have permission to do this!"
   invalid-mode: "&cInvalid display mode!"
+  invalid-target: "&cNo entity was found by that name. Tye /lightlevels targetlist for a list"
+  set-target: "Set target to &7%target%"
   
 # Defines the light levels mobs can spawn in.
 lightlevels:

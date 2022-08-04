@@ -8,11 +8,16 @@ import org.bukkit.block.data.Bisected;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.awt.Color;
 import java.util.*;
 
+/**
+ * Light Visual is a class that handles displaying the visual display to a player.
+ * Each player has their own individual LightVisual instance.
+ */
 public class LightVisual {
 
     private final UUID PLAYER_UUID;
@@ -21,6 +26,7 @@ public class LightVisual {
     private boolean enabled = false;
     private DisplayMethod method;
     private EternalLightConfig config;
+    private EntityType targetType = null;
 
     public LightVisual(Projector projector, UUID uuid) {
         this.projector = projector;
@@ -35,6 +41,13 @@ public class LightVisual {
      */
     public boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * @return the selected target entity type or null if none.
+     */
+    public EntityType getTargetType() {
+        return targetType;
     }
 
     /**
@@ -62,6 +75,16 @@ public class LightVisual {
         if (enabled) show();
         else hide();
         return !enabled;
+    }
+
+    /**
+     * Sets a target entity type to only displace spawning conditions for
+     * that entity. Set to null to disable entity targeting.
+     *
+     * @param type entity type to target the display at.
+     */
+    public void setTargetEntityType(EntityType type) {
+        targetType = type;
     }
 
     /**
@@ -159,11 +182,21 @@ public class LightVisual {
                     // Render the particles depending on the selected method.
                     switch (this.method) {
                         case ALL -> {
-                            LightSpawnCase spawnCase = SpawnConditions.getSpawnCase(onTop);
+                            LightSpawnCase spawnCase;
+                            if (targetType != null) {
+                                spawnCase = SpawnConditions.canSpawnAt(targetType, onTop);
+                            } else {
+                                spawnCase = SpawnConditions.getSpawnCase(onTop);
+                            }
                             particle.setColor(spawnCase.color);
                         }
                         case SPAWNABLE -> {
-                            LightSpawnCase spawnCase = SpawnConditions.getSpawnCase(onTop);
+                            LightSpawnCase spawnCase;
+                            if (targetType != null) {
+                                spawnCase = SpawnConditions.canSpawnAt(targetType, onTop);
+                            } else {
+                                spawnCase = SpawnConditions.getSpawnCase(onTop);
+                            }
                             if (spawnCase == LightSpawnCase.NEVER) continue;
                             particle.setColor(spawnCase.color);
                         }
