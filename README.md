@@ -36,6 +36,8 @@ eternallight.use:
   default: true
 eternallight.mode: 
   default: true
+eternallight.target: 
+  default: true
 ```
 You can see the available options in the documentation to [the permissions.yml file](https://bukkit.gamepedia.com/Permissions.yml). 
 If you are using a permission plugin, refer to its documentation instead.
@@ -46,6 +48,7 @@ If you are using a permission plugin, refer to its documentation instead.
 * `/eternallight renderdistance <distance>` Changes how far out it renders light points. This will cause expetentually more load the larger it is.  
 * `/lightlevels or /ll` Toggles the light level display.  
 * `/lightlevels mode [mode]` Toggles between the active modes for the light level display.
+* `/lightlevels target [target]` Sets a target entity. When a target is set the display modes SPAWNABLE and ALL will be tailored to that specific entity. If the entity only spawns in a specific dimension then it will always show as safe in other dimensions.
 
 # Display Methods
 * `All` Renders yellow where hostile mobs can spawn at night, red where they can spawn at any time, and green where they cannot spawn.
