@@ -1,5 +1,7 @@
 package me.masstrix.eternallight.handle;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import me.masstrix.eternallight.EternalLight;
 import me.masstrix.eternallight.util.EnumUtil;
 import org.bukkit.World;
@@ -54,27 +56,40 @@ public class SpawnConditions {
             // Add entity to list
             String name = String.valueOf(obj);
             EntityType type = EnumUtil.getValue(EntityType.class, name, true);
-            if (type == null)
-                continue;
+            if (type != null) {
+                // Adds entity to the set
+                ALL.add(type.name().toLowerCase());
+                set.add(type);
+            }
 
-            // Adds entity to the set
-            ALL.add(type.name().toLowerCase());
-            set.add(type);
-
-            System.out.println("Loading in " + type.name());
+            System.out.println(obj);
 
             // Creates a special case for the entity
-            if (obj instanceof ConfigurationSection section) {
-                int overWorld = section.getInt("overworld", -1);
-                int nether = section.getInt("nether", -1);
-                int end = section.getInt("end", -1);
+            if (obj.toString().startsWith("{")) {
+                JsonObject json = (JsonObject) JsonParser.parseString(obj.toString());
+                // Load object name
+                name = json.entrySet().stream().findFirst().get().getKey();
+                JsonObject s = json.getAsJsonObject(name);
 
-                SpawnConditions special = SPECIAL_CASE.computeIfAbsent(
-                        type, k -> SPECIAL_CASE.put(k, new SpawnConditions())
-                );
+                System.out.println(json);
+                System.out.println(s);
 
-                if (special == null)
+                // Load settings
+                int overWorld = s.has("overworld") ? s.get("overworld").getAsInt() : -1;
+                int nether = s.has("nether") ? s.get("nether").getAsInt() : -1;
+                int end = s.has("end") ? s.get("end").getAsInt() : -1;
+
+                type = EnumUtil.getValue(EntityType.class, name, true);
+                if (type == null)
                     continue;
+                ALL.add(type.name().toLowerCase());
+                set.add(type);
+
+                SpawnConditions special = SPECIAL_CASE.get(type);
+                if (special == null) {
+                    special = new SpawnConditions();
+                    SPECIAL_CASE.put(type, special);
+                }
 
                 if (overWorld != -1)
                     special.normal = overWorld;
@@ -83,6 +98,8 @@ public class SpawnConditions {
                 if (end != -1)
                     special.end = end;
             }
+
+            System.out.println("Loading in " + type.name());
         }
     }
 
