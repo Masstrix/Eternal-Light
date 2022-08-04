@@ -1,9 +1,9 @@
 name: EternalLight
 main: me.masstrix.eternallight.EternalLight
-description: "Eternal Light makes it easy to see where mobs can spawn."
-version: 1.7.1
+description: "${project.description}"
+version: ${project.version}
 author: Masstrix
-api-version: 1.14
+api-version: ${target.version}
 
 commands:
   eternallight:

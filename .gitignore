@@ -1,5 +1,10 @@
 /.idea
-/out
 *.iml
-.DS_Store
 /.editorconfig
+
+# Output Directories
+/target
+/out
+
+# MacOS
+.DS_Store
