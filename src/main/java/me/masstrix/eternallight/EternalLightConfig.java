@@ -1,6 +1,7 @@
 package me.masstrix.eternallight;
 
 import me.masstrix.eternallight.handle.DisplayMethod;
+import me.masstrix.eternallight.handle.SpawnConditions;
 import me.masstrix.eternallight.util.StringUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,6 +56,9 @@ public class EternalLightConfig {
         if (!file.exists()) plugin.saveDefaultConfig();
         plugin.reloadConfig();
         init(plugin);
+
+        // Reload spawn conditions
+        SpawnConditions.reload();
     }
 
     /**

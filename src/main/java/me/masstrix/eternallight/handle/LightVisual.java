@@ -158,20 +158,16 @@ public class LightVisual {
 
                     // Render the particles depending on the selected method.
                     switch (this.method) {
-                        case ALL: {
-                            LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
+                        case ALL -> {
+                            LightSpawnCase spawnCase = SpawnConditions.getSpawnCase(onTop);
                             particle.setColor(spawnCase.color);
-                            break;
                         }
-
-                        case SPAWNABLE: {
-                            LightSpawnCase spawnCase = LightSpawnCase.getCase(onTop);
+                        case SPAWNABLE -> {
+                            LightSpawnCase spawnCase = SpawnConditions.getSpawnCase(onTop);
                             if (spawnCase == LightSpawnCase.NEVER) continue;
                             particle.setColor(spawnCase.color);
-                            break;
                         }
-
-                        case LIGHTLEVEL: {
+                        case LIGHTLEVEL -> {
                             float p = (float) onTop.getLightFromBlocks() / 14F;
                             Color c = new Color(255, 0, 6);
 
@@ -182,7 +178,6 @@ public class LightVisual {
                             // Shift the hue around by 25%
                             c = new Color(Color.HSBtoRGB((0.25f * p), hsbVals[1], hsbVals[2]));
                             particle.setColor(c);
-                            break;
                         }
                     }
                     particle.send(player, (px + x) + 0.5, (py + y) + getBlockHeight(block) + 0.2, (pz + z) + 0.5);

@@ -156,14 +156,13 @@ public class EternalLight extends JavaPlugin {
     }
 
     /**
-     * If the plugin is legacy it will be disabled on startup.
+     * Returns if the server is running a version before light levels were
+     * changed to use complete darkness for mobs to spawn.
      *
-     * @return if the server version is older than 1.13.
+     * @return if the server is a legacy version for light levels.
      */
-    @Deprecated
-    private boolean isLegacy() {
-        byte[] ver = ReflectionUtil.getVersionUnsafe();
-        return ver.length > 1 && ver[1] < 13;
+    public boolean isLegacyServer() {
+        return MinecraftRelease.getServerVersion().isBehind(new MinecraftVersion("1.18"));
     }
 
     /**
