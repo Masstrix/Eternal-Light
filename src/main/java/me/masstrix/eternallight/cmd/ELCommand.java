@@ -72,7 +72,8 @@ public class ELCommand extends EternalCommand {
                 return;
             }
             else if (args[0].equalsIgnoreCase("version")) {
-                msg(plugin.getPluginConfig().getPrefix() + "&7Checking version...");
+                msg(plugin.getPluginConfig().getPrefix() + "&7Current Version: &f" + plugin.getVersion());
+                msg(plugin.getPluginConfig().getPrefix() + "&7Checking for updates...");
                 plugin.getVersionChecker().run(info -> {
                     String msg = "&cFailed to check version.";
                     if (info.isUnknown()) {
