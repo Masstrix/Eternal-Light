@@ -170,7 +170,7 @@ public class EternalLightConfig {
         DISABLE("deactivate", "&cDisabled&f light level projector."),
         CHANGE_MODE("change-mode", "Set display mode to &7%mode%"),
         INVALID_MODE("invalid-mode", "&cInvalid display mode!"),
-        INVALID_TARGET("invalid-target", "&cNo entity was found by that name. Tye /lightlevels targetlist for a list"),
+        INVALID_TARGET("invalid-target", "&cNo entity was found by that name. Type /lightlevels targetlist for a list"),
         SET_TARGET("set-target", "Set target to &7%target%"),
         NO_PERMISSION("no-permission", "&cYou do not have permission to do this!");
 
